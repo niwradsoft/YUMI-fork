@@ -27,6 +27,9 @@ Homepage: http://www.7-zip.org
 Binary: https://sourceforge.net/projects/sevenzip/files/7-Zip/16.02/7z1602.exe
 Source: https://sourceforge.net/projects/sevenzip/files/7-Zip/16.02/7z1602-src.7z
 
+Binary: https://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.exe
+Source: https://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.tar.bz2
+
 
 Fat32format.exe (Fat32format)
 

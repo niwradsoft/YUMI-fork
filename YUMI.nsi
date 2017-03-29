@@ -26,7 +26,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.2.7"
+!define VERSION "2.0.2.9"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
