@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.3"
+!define VERSION "2.0.4.4"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -133,7 +133,7 @@ Var DismountAction
 Var VHDDisk
 Var VHDSize
 Var VHDLBL
-
+Var FSType
 
 !include DiskVoodoo.nsh
 
@@ -303,7 +303,7 @@ Function SelectionsPage
   ${NSD_OnChange} $DestDriveTxt OnSelectDrive 
   
 ; All Drives Option
-  ${NSD_CreateCheckBox} 30% 23 30% 15 "Show All Drives?" ; was 17% 23 41% 15
+  ${NSD_CreateCheckBox} 36% 23 23% 15 "Show All Drives?" ; was 30% 23 30% 15
   Pop $AllDriveOption
   ${NSD_OnClick} $AllDriveOption ListAllDrives   
   
@@ -360,13 +360,13 @@ Function SelectionsPage
   ${NSD_SetText} $LabelDrivePage "Step 1: Select the Drive Letter of your USB Device."    
   
 ; Droplist for Drive Selection
-  ${NSD_CreateDropList} 0 20 28% 15 "" ; was 0 20 15% 15
+  ${NSD_CreateDropList} 0 20 35% 15 "" ; was 0 20 28% 15
   Pop $DestDriveTxt
   Call ListAllDrives
   ${NSD_OnChange} $DestDriveTxt OnSelectDrive
  
 ; All Drives Option
- ${NSD_CreateCheckBox} 30% 23 30% 15 "Show All Drives?" ; was 17% 23 41% 15
+ ${NSD_CreateCheckBox} 36% 23 23% 15 "Show All Drives?" ; was 30% 23 30% 15
  Pop $AllDriveOption
  ${NSD_OnClick} $AllDriveOption ListAllDrives 
   
@@ -548,8 +548,12 @@ Function EnableNext ; Enable Install Button
   ;${If} $Blocksize >= 4 
   ${If} $Removal != "Yes"
   ${AndIf} $HDDUSB != "HDD"
-  ShowWindow $Format 1 
-  ShowWindow $FormatFat 1
+    ${If} $FormatMe == "YES" 
+    ShowWindow $Format 1 
+    ${EndIf}
+    ${If} $FormatMeFat == "YES" 
+    ShowWindow $FormatFat 1 
+    ${EndIf}
   ${Else}
   ShowWindow $Format 0
   ShowWindow $FormatFat 0
@@ -619,6 +623,7 @@ Function EnableNext ; Enable Install Button
   ${If} $Persistence == "casper" ; If can use Casper Persistence... 
   ${AndIf} $TheISO != ""
   ${AndIf} $BootDir != "" 
+  ${AndIf} $FSType != "NTFS" ; prevent casper if NTFS... implement fix for this later.
   ShowWindow $CasperSelection 1
   ShowWindow $CasperSlider 1
   ShowWindow $SlideSpot 1
@@ -779,7 +784,6 @@ Function OnSelectDistro
  ${Else}
   ShowWindow $DownloadISO 1
  ${EndIf}
-  
 FunctionEnd 
 
 ; On Selection of ISO File
@@ -828,6 +832,12 @@ Function ISOBrowse
  ${EndIf}
  Call EnableNext
  ; Uncomment for Testing --> MessageBox MB_ICONQUESTION|MB_OK 'Removal: "$Removal"  ISOFileName: "$ISOFileName" ISOFile "$ISOFile" BootDir: "$BootDir" DestDisk: "$DestDisk" DestDrive: "$DestDrive" ISOTest: "$ISOTest"'
+  
+  ${If} $FSType != "NTFS"
+  ${AndIf} $FormatMe != "Yes"
+  ${AndIf} $DistroName == "Windows to Go (Virtual Hard Disk)"
+  MessageBox MB_ICONSTOP|MB_OK "WARNING! ($DestDisk) is not NTFS formatted. NTFS is required for the Windows to Go option to work."
+  ${EndIf}  
  FunctionEnd
 
 Function ClearAll
@@ -842,7 +852,9 @@ Function InstallorRemove ; Populate DistroName based on Install/Removal option
   ${If} $Removal == "Yes" 
   Call RemovalList
   ${Else}
-   ${NSD_SetText} $LinuxDistroSelection "Step 2: Select a Distribution to put on $DestDisk" 
+    ${If} $DistroName == ""
+    ${NSD_SetText} $LinuxDistroSelection "Step 2: Select a Distribution to put on $DestDisk" 
+	${EndIf}
   Call SetISOFileName
   ${EndIf}
 FunctionEnd  
@@ -957,11 +969,12 @@ FunctionEnd
 Function DrivesList
  Call GetDiskVolumeName
  Call DiskSpace
+ Call GetFSType
  
 ;Prevent System Drive from being selected
  StrCpy $7 $WINDIR 3
  ${If} $9 != "$7" 
- SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $8" 
+ SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $FSType $8" 
  ;SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $2 $8" 
  ${EndIf}
  Push 1 ; must push something - see GetDrives documentation
@@ -1080,6 +1093,7 @@ FunctionEnd
 
 Function FreeDiskSpace
 ${If} $FormatMe == "Yes"
+${OrIf} $FormatMeFat == "Yes"
 ${DriveSpace} "$JustDrive" "/D=T /S=M" $1
 ${Else}
 ${DriveSpace} "$JustDrive" "/D=F /S=M" $1
@@ -1187,7 +1201,7 @@ FunctionEnd
 
 ; Custom Distros Installer - Uninstaller Include
 !include "InstallDistro.nsh" ; ##################################### ADD NEW DISTRO ########################################
-!include "RemoveDistro.nsh" ; ##################################### ADD NEW DISTRO ########################################
+!include "RemoveDistro.nsh" ; ##################################### REM DISTRO ########################################
 
 Function DoSyslinux ; Install Syslinux on USB
   ${IfNot} ${FileExists} "$BootDir\multiboot\libcom32.c32" 
@@ -1538,4 +1552,9 @@ Function SetISOSize ; Get size of ISO
  StrCpy $SizeOfCasper "$1"
  ;MessageBox MB_OK|MB_ICONINFORMATION "ISO Size: $SizeOfCasper"
  System::Call 'kernel32::CloseHandle(i r0)'
+FunctionEnd
+
+Function GetFSType
+System::Call 'Kernel32::GetVolumeInformation(t "$9",t,i ${NSIS_MAX_STRLEN},*i,*i,*i,t .r1" ,i ${NSIS_MAX_STRLEN}) i.r0'
+ StrCpy $FSType "$1"
 FunctionEnd
