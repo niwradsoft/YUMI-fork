@@ -20,10 +20,12 @@ Credits, Resources, and Third Party Tools used:
 * Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/ (unmodified binary used)
 * dd.exe © John Newbigin http://www.chrysocome.net/ (unmodified binary used)
 * mke2fs © Matt <mattwu@163.com> http://www.ext2fsd.com (unmodified binary used)
+* Tuffy Font © Thatcher Ulrich http://tulrich.com/fonts/ (unmodified binary used)
 
 Additional information for YUMI can be found HERE: http://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 Changelog:
+08/17/16 Version 2.0.2.7: Add support for Arch Bang, Skywave Linux, and Cyborg Linux.
 07/07/16 Version 2.0.2.6: Add support for Android-x86. Fix broken Manjaro entry. Update credits and sources.
 07/01/16 Version 2.0.2.5: Fix Eset, avira, and Dr.Web menu entries which became broken in build 2.0.2.4. 
 06/28/16 Version 2.0.2.4: Update to support Cub Linux. Fix broken WifiSlax entry. Switch to use alternate method for old Ubuntu derivitives with conflicting syslinux gfxboot.

@@ -26,7 +26,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.2.6"
+!define VERSION "2.0.2.7"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -873,11 +873,11 @@ Function FormatYes ; If Format is checked, do something
   ${If} $FormatMe == "Yes"
  
 ; Close All Open Explorer Windows 
-  ;DetailPrint "Closing All Open Explorer Windows" 
-  ;FindWindow $R0 CabinetWClass
-  ;IsWindow $R0 0 +3
-  ;SendMessage $R0 ${WM_SYSCOMMAND} 0xF060 0
-  ;Goto -3
+  DetailPrint "Closing All Open Explorer Windows" 
+  FindWindow $R0 CabinetWClass
+  IsWindow $R0 0 +3
+  SendMessage $R0 ${WM_SYSCOMMAND} 0xF060 0
+  Goto -3
   
   SetShellVarContext all
   InitPluginsDir
@@ -1172,7 +1172,8 @@ Pop $NameThatISO
  
 checkpoint:
  ${If} $FormatMe == "Yes" 
- MessageBox MB_YESNO|MB_ICONEXCLAMATION "NOTE: You must manually close all open Explorer Windows and files in use on ($DestDisk) so that the drive can be successfully Fat32 Formatted!$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Fat32 Format ($DestDisk) - All Data will be Irrecoverably Deleted!$\r$\n$\r$\n2. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n3. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n4. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
+; MessageBox MB_YESNO|MB_ICONEXCLAMATION "NOTE: You must manually close all open Explorer Windows and files in use on ($DestDisk) so that the drive can be successfully Fat32 Formatted!$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Fat32 Format ($DestDisk) - All Data will be Irrecoverably Deleted!$\r$\n$\r$\n2. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n3. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n4. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
+ MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: To reduce the risk of losing data, you must save and close all open work before proceeding! YUMI will proceed to automatically terminate any open Explorer Windows so that drive ($DestDisk) can be successfully Fat32 Formatted!$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Fat32 Format ($DestDisk) - All Data will be Irrecoverably Deleted!$\r$\n$\r$\n2. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n3. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n4. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
  Quit
  ${ElseIf} $FormatMe != "Yes" 
  ${AndIfNot} ${FileExists} $BootDir\multiboot\syslinux.cfg

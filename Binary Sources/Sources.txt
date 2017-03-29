@@ -54,3 +54,7 @@ Firadisk.img (File/Ram Disk Driver)
 Homepage: http://reboot.pro/8804/
 Binary: http://www.mediafire.com/file/zqbzl5sa77tlmpl/firadisk-driver-0.0.1.30-f6.7z
 Source: http://www.mediafire.com/file/vbd2dwas2rckdj5/firadisk-src-0.0.1.30.7z
+
+Tuffy Font
+
+Homepage, Binary, Source: http://tulrich.com/fonts/

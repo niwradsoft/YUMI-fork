@@ -495,10 +495,15 @@ FunctionEnd
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux.cfg" 
    ${AndIf} ${FileExists} "$BootDir\multiboot\$JustISOName\help2.msg"  ; Probably Puppy based  
    !insertmacro ReplaceInFile "pmedia=cd" "psubdir=/multiboot/$JustISOName psubok=TRUE" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux.cfg"    
+   !insertmacro ReplaceInFile "append pfix=" "append psubdir=/multiboot/$JustISOName psubok=TRUE pfix=" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux.cfg"       
+   !insertmacro ReplaceInFile "#append rootfstype=ramfs" "append psubdir=/multiboot/$JustISOName psubok=TRUE" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux.cfg"       
+  
    ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux.cfg" 
    ${AndIf} ${FileExists} "$BootDir\multiboot\$JustISOName\help\help.msg"  ; Probably Puppy based 
    !insertmacro ReplaceInFile "append search" "append search psubdir=/multiboot/$JustISOName psubok=TRUE" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux.cfg"       
-  ${EndIf} 
+   !insertmacro ReplaceInFile "#append rootfstype=ramfs" "append psubdir=/multiboot/$JustISOName psubok=TRUE" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux.cfg"       
+   !insertmacro ReplaceInFile "append pfix=" "append psubdir=/multiboot/$JustISOName psubok=TRUE pfix=" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux.cfg"       
+   ${EndIf} 
   
 ; For Clonezilla, and DRBL
   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\syslinux\syslinux.cfg" ; Rename the following for syslinux syslinux.cfg
@@ -701,6 +706,17 @@ FunctionEnd
    !insertmacro ReplaceInFile "archisobasedir=arch" "archisobasedir=/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys32.cfg"     
    !insertmacro ReplaceInFile "archisolabel=ARCH" "archisolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys32.cfg"     
    ${EndIf}  
+   
+; ArchBang
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"    
+   !insertmacro ReplaceInFile "CONFIG /arch" "CONFIG /multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+   !insertmacro ReplaceInFile "APPEND /arch" "APPEND /multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
+   !insertmacro ReplaceInFile "LINUX /arch" "LINUX /multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"     
+   !insertmacro ReplaceInFile "INITRD /arch" "INITRD /multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"     
+   !insertmacro ReplaceInFile "archisobasedir=arch" "archisobasedir=/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"     
+   !insertmacro ReplaceInFile ",/arch" ",/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"     
+   !insertmacro ReplaceInFile "archisolabel=ARCH" "archisolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"     
+   ${EndIf}     
 
 ; Manjaro
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\.miso"  
