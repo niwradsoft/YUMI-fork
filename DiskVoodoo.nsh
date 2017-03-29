@@ -219,9 +219,6 @@ Function DismountVol
        ExecWait '"$PLUGINSDIR\dd.exe" if=$ISOFile od=$DestDisk bs=1M --size --progress'
        ${ElseIf} $DismountAction == "WIPE_FORMAT"	
 	   NsExec::ExecToLog '"$PLUGINSDIR\dd.exe" if=/dev/zero od=$DestDisk bs=3M count=1 --size --progress'
-	   ;NsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpart.txt'
-	   ;File /oname=$PLUGINSDIR\fat32format.exe "fat32format.exe" 
-	   ;NsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format.exe $DestDisk"' ;/Q /y
 	   ${Else}
 	   ${EndIf}
 	 

@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.1"
+!define VERSION "2.0.4.2"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -50,6 +50,7 @@ InstallButtonText "Create"
 !AddPluginDir "plugins"
 
 ; Variables
+Var HDDUSB
 Var Capacity
 Var VolName
 Var Checker
@@ -497,9 +498,12 @@ FunctionEnd
 Function EnableNext ; Enable Install Button
   ;${If} $Blocksize >= 4 
   ${If} $Removal != "Yes"
+  ${AndIf} $HDDUSB != "HDD"
   ShowWindow $Format 1 
   ${Else}
   ShowWindow $Format 0
+  ${NSD_UnCheck} $Format
+  StrCpy $FormatMe ""  
   ${EndIf}
   ${If} $Removal != "Yes"    
    ${AndIf} $ISOFileName != ""
@@ -848,6 +852,7 @@ Function OnSelectDrive
   StrCpy $JustDrive $DestDrive 3  
   StrCpy $BootDir $DestDrive 2 ;was -1 
   StrCpy $DestDisk $DestDrive 2 ;was -1
+  StrCpy $HDDUSB $Letters "" -3 
   SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new drive may have been chosen ; Enable for DropBox
   StrCpy $Checker "Yes" 
   Call InstallorRemove
@@ -902,7 +907,7 @@ Function DrivesList
 ;Prevent System Drive from being selected
  StrCpy $7 $WINDIR 3
  ${If} $9 != "$7" 
- SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity" 
+ SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $8" 
  ;SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $2 $8" 
  ${EndIf}
  Push 1 ; must push something - see GetDrives documentation
@@ -921,15 +926,11 @@ Function FormatYes ; If Format is checked, do something
   StrCpy $DismountAction "WIPE_FORMAT"
   Call Lock_Dismount ; Lock and Dismount Volume
   Call UnLockVol ; Unlock to allow Access
-  
-  Sleep 1000
+  DetailPrint "Running Diskpart on $DestDisk. This may take a few seconds, please be patient..."
  ;ToDO - Need to make a checkpoint here to test if is greater than Win XP (Vista or later OS?). XP doesn't support Diskpart on removable disks.
-  nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpartformat.txt'
-  Sleep 1000  
- 
+  nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpartformat.txt' 
   DetailPrint "Formatting $DestDisk as Fat32. This may take a while, please be patient..."
   nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format $DestDisk"' ;/Q /y
-  ;nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format -c$BlockSize $DestDisk"' ;/Q /y
   ${EndIf}   
 FunctionEnd
 
@@ -1232,7 +1233,7 @@ Pop $NameThatISO
  
 checkpoint:
  ${If} $FormatMe == "Yes" 
- MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: To reduce the risk of losing data, you must save and close all open work before proceeding! YUMI will attempt to lock and dismount ($DestDisk) so it can be successfully Fat32 Formatted!$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Fat32 Format ($DestDisk) - All Data will be Irrecoverably Deleted!$\r$\n$\r$\n2. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n3. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n4. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
+ MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: Backup any data on this drive before proceeding! All existing data (including any other volumes, partitions, and associated drive letters on this drive), will be destroyed.$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1.) Lock and Dismount Disk - Allows ($DestDisk) to be wiped, cleaned, and partitioned.$\r$\n$\r$\n2.) Fat32 Format ($DestDisk) - All Data (including any other volumes, partitions, and associated drive letters on this drive) will be Irrecoverably Deleted!$\r$\n$\r$\n3.) Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n4.) Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n5.) Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive this Drive is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions or NO to Go Back!" IDYES proceed
  Quit
  ${ElseIf} $FormatMe != "Yes" 
  ${AndIfNot} ${FileExists} $BootDir\multiboot\syslinux.cfg

@@ -1,8 +1,9 @@
 list volume
 select volume DSK
 clean
+clean
 create partition primary
 select partition 1
-list partition
 active
+list volume
 exit
