@@ -490,6 +490,82 @@ FunctionEnd
  
 ; Unlisted ISOs
 
+; Multiple Windows To Go (Virtual Hard Disk)
+ ${ElseIf} $DistroName == "Windows to Go (Virtual Hard Disk)"
+ StrCpy $ConfigFile == "win2go.lst" ; Make sure it isn't NULL   
+
+ StrCpy $VHDSize "20000"
+ StrCpy $VHDLBL "$JustISOName" 11
+ 
+ !insertmacro ReplaceInFile "DSK" "$BootDir\multiboot\$JustISOName" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt" 
+ !insertmacro ReplaceInFile "DSK" "$BootDir\multiboot\$JustISOName" "all" "all" "$PLUGINSDIR\diskpartdetach.txt" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$PLUGINSDIR\diskpartdetach.txt"  
+ !insertmacro ReplaceInFile "VHDFMT" "ntfs" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt"  ; edit this to format type
+ !insertmacro ReplaceInFile "VHDSIZE" "$VHDSize" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt"  ; edit this to beyond the calculated filesize in bytes
+ !insertmacro ReplaceInFile "VHDLBL" "$VHDLBL" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt"  
+ 
+ DetailPrint "Creating a Virtual Hard Disk for $JustISOName. Please be patient, this may take time..." 
+ nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\w2gdiskpart.txt' 
+ CopyFiles "$PLUGINSDIR\dskvol.txt" "$BootDir\multiboot\$JustISOName\dskvol.txt" 
+ Call GetVolNameDSK 
+ StrCpy $VHDDisk "$VHDDisk" 1
+ DetailPrint "Installing $JustISOName to Virtual Hard Disk. Please be patient, this may take time..." 
+ CreateDirectory "$EXEDIR\TEMPYUMI" ; Create the TEMPYUMI directory
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!boot.sdi -ir!install.wim -ir!install.esd -o"$EXEDIR\TEMPYUMI" -y'
+
+${If} ${FileExists} "$EXEDIR\TEMPYUMI\install.wim" 
+ ExecWait '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex apply $EXEDIR\TEMPYUMI\install.wim 1 $VHDDisk:\' 
+${ElseIf} ${FileExists} "$EXEDIR\TEMPYUMI\install.esd" 
+ ExecWait '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex apply $EXEDIR\TEMPYUMI\install.esd 1 $VHDDisk:\'  
+${EndIf} 
+  
+  !insertmacro ReplaceInFile "VHDDISK" "$VHDDISK" "all" "all" "$PLUGINSDIR\boot.cmd"  
+  
+  !include "x64.nsh"
+  ${DisableX64FSRedirection} 
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\boot.cmd'
+  
+  !insertmacro ReplaceInFile "$VHDDISK" "VHDDISK" "all" "all" "$PLUGINSDIR\boot.cmd" ;revert back in case of reuse during add additional distro
+  
+  CopyFiles "$VHDDISK:\bootmgr" "$BootDir\multiboot\$JustISOName"
+  CopyFiles "$VHDDISK:\boot" "$BootDir\multiboot\$JustISOName"
+ 
+  ;${IfNot} ${FileExists} "$VHDDISK\efi\microsoft\boot\bcd"
+   nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} device vhd=[locate]\multiboot\$JustISOName\$JustISOName.vhd'
+   nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} osdevice vhd=[locate]\multiboot\$JustISOName\$JustISOName.vhd'
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Boot $JustISOName$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
+  ;${Else} 
+  ; CopyFiles "$VHDDISK\bootmgr.efi" "$BootDir\multiboot\$JustISOName"
+  ; CopyFiles "$VHDDISK\efi" "$BootDir\multiboot\$JustISOName"
+  ; nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} device vhd=[locate]\multiboot\$JustISOName\$JustISOName.vhd'
+  ; nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} osdevice vhd=[locate]\multiboot\$JustISOName\$JustISOName.vhd'
+  ; nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} device vhd=[locate]\multiboot\$JustISOName\$JustISOName.vhd'
+  ; nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} osdevice vhd=[locate]\multiboot\$JustISOName\$JustISOName.vhd'
+  ; ${WriteToFile} "#start $JustISOName$\r$\ntitle Boot $JustISOName$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
+   ;;${WriteToFile} "#start $JustISOName$\r$\ntitle Boot $JustISO$\r$\nchainloader /bootmgr$\r$\n#end $JustISOName" $R0  
+  ;${Endif}
+  ${EnableX64FSRedirection} 
+  
+ ${IfNot} ${FileExists} "$BootDir\boot\bcd"
+   CreateDirectory $BootDir\boot	    
+ ${Endif}
+   CopyFiles "$VHDDISK:\boot" "$BootDir"
+   CopyFiles $EXEDIR\TEMPYUMI\boot.sdi "$BootDir\boot\bcd" ;just copying a file large enough in size to be used for our bcd container...
+ 
+  RMDir /R "$EXEDIR\TEMPYUMI"
+  nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpartdetach.txt'   
+  
+ ;revert back in case of reuse during add additional distro
+ !insertmacro ReplaceInFile "$BootDir\multiboot\$JustISOName" "DSK" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt" 
+ !insertmacro ReplaceInFile "$JustISOName" "SLUG" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt" 
+ !insertmacro ReplaceInFile "$BootDir\multiboot\$JustISOName" "DSK" "all" "all" "$PLUGINSDIR\diskpartdetach.txt" 
+ !insertmacro ReplaceInFile "$JustISOName" "SLUG" "all" "all" "$PLUGINSDIR\diskpartdetach.txt"  
+ !insertmacro ReplaceInFile "ntfs" "VHDFMT" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt"  ; edit this to format type
+ !insertmacro ReplaceInFile "$VHDSize" "VHDSIZE" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt"  ; edit this to beyond the calculated filesize in bytes
+ !insertmacro ReplaceInFile "$VHDLBL" "VHDLBL" "all" "all" "$PLUGINSDIR\w2gdiskpart.txt"   
+
+ 
  ${ElseIf} $DistroName == "Try Unlisted ISO (Virtual Hard Disk DD)"  
  CopyFiles "$PLUGINSDIR\dd-diskpart.txt" "$BootDir\multiboot\$JustISOName\dd-diskpart.txt" 
  CopyFiles "$PLUGINSDIR\diskpartdetach.txt" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt"   

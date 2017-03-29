@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.2"
+!define VERSION "2.0.4.3"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -57,6 +57,8 @@ Var Checker
 Var FileFormat
 Var Format 
 Var FormatMe
+Var FormatFat 
+Var FormatMeFat
 Var BlockSize
 Var Dialog
 Var LabelDrivePage
@@ -87,7 +89,11 @@ Var DestDisk
 Var DownloadISO
 Var DownloadMe
 Var Link
+Var Link1
+Var Link2
 Var Links
+Var Links1
+Var Links2
 Var Auth
 Var DownLink
 Var LocalSelection
@@ -124,8 +130,10 @@ Var MaxPersist
 Var Persistence
 ;Var VolMountPoint
 Var DismountAction
-;Var VHDDisk
+Var VHDDisk
 Var VHDSize
+Var VHDLBL
+
 
 !include DiskVoodoo.nsh
 
@@ -159,7 +167,7 @@ Page custom SelectionsPage
 !define MUI_FINISHPAGE_TITLE $(Finish_Title)
 !define MUI_FINISHPAGE_TEXT $(Finish_Text)
 !define MUI_FINISHPAGE_LINK $(Finish_Link)
-!define MUI_FINISHPAGE_LINK_LOCATION "https://www.pendrivelinux.com/boot-multiple-iso-from-usb-multiboot-usb/"
+!define MUI_FINISHPAGE_LINK_LOCATION "https://www.pendrivelinux.com/yumi-multiboot-usb-creator/"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "images\finish.bmp"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE Finish_PreFunction
 !insertmacro MUI_PAGE_FINISH
@@ -181,7 +189,7 @@ LangString Extract ${LANG_ENGLISH} "Extracting the $FileFormat: The progress bar
 LangString CreateSysConfig ${LANG_ENGLISH} "Creating configuration files for $DestDisk"
 LangString ExecuteSyslinux ${LANG_ENGLISH} "Executing syslinux on $BootDir"
 LangString SkipSyslinux ${LANG_ENGLISH} "Good Syslinux Exists..."
-LangString WarningSyslinux ${LANG_ENGLISH} "An error ($R8) occurred while executing syslinux.$\r$\nYour USB drive won't be bootable..."
+LangString WarningSyslinux ${LANG_ENGLISH} "An error ($R8) occurred while executing syslinux.$\r$\nYour USB drive won't be bootable...$\r$\n$\r$\nCheck to make sure your drive is formatted as Fat32 or NTFS."
 LangString WarningSyslinuxOLD ${LANG_ENGLISH} "This YUMI revision uses a newer Syslinux version that is not compatible with earlier revisions.$\r$\nPlease ensure your USB drive doesn't contain earlier revision installs."
 LangString Install_Title ${LANG_ENGLISH} "$InUnStalling $InUnName"
 LangString Install_SubTitle ${LANG_ENGLISH} "Please wait while we $InUnStall $InUnName $OnFrom $JustDrive"
@@ -300,14 +308,29 @@ Function SelectionsPage
   ${NSD_OnClick} $AllDriveOption ListAllDrives   
   
 ; Format Drive Option
-  ${NSD_CreateCheckBox} 60% 23 100% 15 "Format $DestDisk Drive (Erase Content)?"
+  ${NSD_CreateCheckBox} 60% 23 100% 15 "NTFS Format $DestDisk"
   Pop $Format
-  ${NSD_OnClick} $Format FormatIt     
- 
-; Add Help Link
-  ${NSD_CreateLink} 0 215 65% 15 "Click HERE to visit the YUMI page for additional Info!"
+  ${NSD_OnClick} $Format FormatIt  
+
+; Format Fat32 Option
+  ${NSD_CreateCheckBox} 60% 40 100% 15 "Fat32 Format $DestDisk"
+  Pop $FormatFat
+  ${NSD_OnClick} $FormatFat FormatIt    
+  
+; Add Home Link
+  ${NSD_CreateLink} 0 215 16% 15 "Home Page"
   Pop $Link
-  ${NSD_OnClick} $LINK onClickMyLink 
+  ${NSD_OnClick} $LINK onClickMyLink    
+  
+; Add Help Link
+  ${NSD_CreateLink} 16% 215 9% 15 "FAQ"
+  Pop $Link1
+  ${NSD_OnClick} $LINK1 onClickMyLinkFAQ 
+  
+; Add Giveback Link
+  ${NSD_CreateLink} 25% 215 30% 15 "Recommended Flash Drives"
+  Pop $Link2
+  ${NSD_OnClick} $LINK2 onClickMyLinkUSB   
  
 ; Disable Next Button until a selection is made for all 
   GetDlgItem $6 $HWNDPARENT 1
@@ -348,9 +371,14 @@ Function SelectionsPage
  ${NSD_OnClick} $AllDriveOption ListAllDrives 
   
 ; Format Drive Option
-  ${NSD_CreateCheckBox} 60% 23 100% 15 "Format $DestDisk Drive (Erase Content)?"
+  ${NSD_CreateCheckBox} 60% 23 100% 15 "NTFS Format $DestDisk (Wipes Drive)"
   Pop $Format
-  ${NSD_OnClick} $Format FormatIt    
+  ${NSD_OnClick} $Format FormatIt  
+
+; Format Fat32 Option
+  ${NSD_CreateCheckBox} 60% 40 100% 15 "Fat32 Format $DestDisk (Wipes Drive)"
+  Pop $FormatFat
+  ${NSD_OnClick} $FormatFat FormatIt  
  
 ; Distro Selection Starts
   ${NSD_CreateLabel} 0 50 50% 15 $(Distro_Text) 
@@ -403,12 +431,22 @@ Function SelectionsPage
 
   SendMessage $CasperSlider ${TBM_SETRANGEMIN} 1 0 ; Min Range Value 0
   SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 $RemainingSpace ; Max Range Value $RemainingSpace
-  ${NSD_OnNotify} $CasperSlider onNotify_CasperSlider    
+  ${NSD_OnNotify} $CasperSlider onNotify_CasperSlider  
+
+; Add Home Link
+  ${NSD_CreateLink} 0 215 16% 15 "Home Page"
+  Pop $Link
+  ${NSD_OnClick} $LINK onClickMyLink    
   
 ; Add Help Link
-  ${NSD_CreateLink} 0 215 65% 15 "Click HERE to visit the YUMI page for additional Info!"
-  Pop $Link
-  ${NSD_OnClick} $LINK onClickMyLink  
+  ${NSD_CreateLink} 16% 215 9% 15 "FAQ"
+  Pop $Link1
+  ${NSD_OnClick} $LINK1 onClickMyLinkFAQ 
+  
+; Add Giveback Link
+  ${NSD_CreateLink} 25% 215 30% 15 "Recommended Flash Drives"
+  Pop $Link2
+  ${NSD_OnClick} $LINK2 onClickMyLinkUSB  
 
 ;; Add a custom donate button
 ;   ${NSD_CreateBitmap} 80% 125 20% 50 "PayPal Donation"
@@ -437,6 +475,7 @@ Function SelectionsPage
   ShowWindow $CasperSlider 0 
   ShowWindow $SlideSpot 0  
   ShowWindow $Format 0
+  ShowWindow $FormatFat 0
   ShowWindow $ForceShowAll 0
   ShowWindow $Uninstaller 0
   nsDialogs::Show 
@@ -478,6 +517,16 @@ Function onClickMyLink
   ExecShell "open" "https://www.pendrivelinux.com/yumi-multiboot-usb-creator/"
 FunctionEnd
 
+Function onClickMyLinkFAQ
+  Pop $Links1 ; pop something to prevent corruption
+  ExecShell "open" "https://www.pendrivelinux.com/yumi-multiboot-usb-creator/#FAQ"
+FunctionEnd
+
+Function onClickMyLinkUSB
+  Pop $Links2 ; pop something to prevent corruption
+  ExecShell "open" "https://www.pendrivelinux.com/recommended-usb-flash-drives/"
+FunctionEnd
+
 Function onClickLinuxSite
   Pop $OfficialSite 
   ExecShell "open" "$Homepage"
@@ -500,8 +549,10 @@ Function EnableNext ; Enable Install Button
   ${If} $Removal != "Yes"
   ${AndIf} $HDDUSB != "HDD"
   ShowWindow $Format 1 
+  ShowWindow $FormatFat 1
   ${Else}
   ShowWindow $Format 0
+  ShowWindow $FormatFat 0
   ${NSD_UnCheck} $Format
   StrCpy $FormatMe ""  
   ${EndIf}
@@ -771,6 +822,7 @@ Function ISOBrowse
  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\*.*"
  ${AndIf} $JustISOName != ""
  ${AndIf} $FormatMe != "Yes"
+ ${AndIf} $FormatMeFat != "Yes"
  MessageBox MB_OK "$JustISOName is already on $DestDisk$\r$\nPlease Remove it first!$\r$\n$\r$\nNOTE: If you have already removed it using YUMI,$\r$\nmanually delete the $BootDir\multiboot\$JustISOName\ folder."
  ${Else}
  ${EndIf}
@@ -800,6 +852,7 @@ Function Uninstall
   ${NSD_GetState} $Uninstaller $Removal
   ${If} $Removal == ${BST_CHECKED}
   ShowWindow $Format 0
+  ShowWindow $FormatFat 0
     ShowWindow $LabelISOSelection 0 
 	Call ClearAll	
     EnableWindow $ISOFileTxt 0
@@ -825,6 +878,7 @@ Function Uninstall
 
   ${ElseIf} $Removal == ${BST_UNCHECKED}
    ShowWindow $Format 1  
+   ShowWindow $FormatFat 1
     ShowWindow $LabelISOSelection 1 
     ShowWindow $ISOFileTxt 1
 	ShowWindow $ISOSelection 0
@@ -929,26 +983,55 @@ Function FormatYes ; If Format is checked, do something
   DetailPrint "Running Diskpart on $DestDisk. This may take a few seconds, please be patient..."
  ;ToDO - Need to make a checkpoint here to test if is greater than Win XP (Vista or later OS?). XP doesn't support Diskpart on removable disks.
   nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpartformat.txt' 
+  
+  ${ElseIf} $FormatMeFat == "Yes"  
+  !insertmacro ReplaceInFile "DSK" "$DestDisk" "all" "all" "$PLUGINSDIR\diskpartformat.txt" 
+  StrCpy $DismountAction "WIPE_FORMAT"
+  Call Lock_Dismount ; Lock and Dismount Volume
+  Call UnLockVol ; Unlock to allow Access
+  DetailPrint "Running Diskpart on $DestDisk. This may take a few seconds, please be patient..."
+ ;ToDO - Need to make a checkpoint here to test if is greater than Win XP (Vista or later OS?). XP doesn't support Diskpart on removable disks.
+  nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpartformat.txt' 
+  
+  ;StrCpy $DismountAction ""
+  ;Call Lock_Dismount ; Lock and Dismount Volume
+  ;Call UnLockVol ; Unlock to allow Access
+  Sleep 2000
   DetailPrint "Formatting $DestDisk as Fat32. This may take a while, please be patient..."
   nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format $DestDisk"' ;/Q /y
   ${EndIf}   
 FunctionEnd
 
 Function FormatIt ; Set Format Option
+
+  ${NSD_GetState} $FormatFat $FormatMeFat
+  ${If} $FormatMeFat == ${BST_CHECKED}
+  ${NSD_Check} $FormatFat
+   ShowWindow $Format 0
+   StrCpy $FormatMeFat "Yes"
+  ${NSD_SetText} $FormatFat "We Will Fat32 Format $DestDisk"
+  ${ElseIf} $FormatMeFat == ${BST_UNCHECKED}
+  ${NSD_Uncheck} $FormatFat
+   ShowWindow $Format 1
+  ${NSD_SetText} $FormatFat "Fat32 Format $DestDisk (Wipes Drive)"  
+   ShowWindow $Uninstaller 1 ; Re-enable Uninstaller option.
+   StrCpy $Checker "Yes" 
+   Call SetSpace
+  ${EndIf}    
+
   ${NSD_GetState} $Format $FormatMe
   ${If} $FormatMe == ${BST_CHECKED}
   ${NSD_Check} $Format
-    StrCpy $FormatMe "Yes"
-  ${NSD_SetText} $Format "We Will Fat32 Format $DestDisk Drive!"
-    ; SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
+   ShowWindow $FormatFat 0
+   StrCpy $FormatMe "Yes"
+  ${NSD_SetText} $Format "We Will NTFS Format $DestDisk"
 	ShowWindow $Uninstaller 0 ; Disable Uninstaller option because we will be formatting the drive.
     StrCpy $Checker "Yes"	
 	Call SetSpace
-  
   ${ElseIf} $FormatMe == ${BST_UNCHECKED}
-  ${NSD_Uncheck} $Format 
-  ${NSD_SetText} $Format "Format $DestDisk Drive (Erase Content)?"  
-    ; SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
+  ${NSD_Uncheck} $Format
+   ShowWindow $FormatFat 1
+  ${NSD_SetText} $Format "NTFS Format $DestDisk (Wipes Drive)"  
     ShowWindow $Uninstaller 1 ; Re-enable Uninstaller option.
 	StrCpy $Checker "Yes" 
 	Call SetSpace
@@ -1005,6 +1088,7 @@ FunctionEnd
 
 Function SetSpace ; Set space available for persistence
 ${If} $FormatMe != "Yes"
+${AndIf} $FormatMeFat != "Yes"
   ;StrCpy $0 '$0'
   Call FreeDiskSpace
   IntOp $MaxPersist 4090 + $CasperSize ; Space required for distro and 4GB max persistent file
@@ -1023,6 +1107,7 @@ FunctionEnd
 
 Function HaveSpacePre ; Check space required
  ${If} $FormatMe != "Yes" ; FIXME: Need to find a better method to check disk space when the drive appears unformatted (I.E. after it's been dd'd, etc).
+ ${AndIf} $FormatMeFat != "Yes"
   Call CasperSize
   Call FreeDiskSpace
   System::Int64Op $1 > $SizeOfCasper ; Compare the space available > space required
@@ -1233,9 +1318,13 @@ Pop $NameThatISO
  
 checkpoint:
  ${If} $FormatMe == "Yes" 
+ MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: Backup any data on this drive before proceeding! All existing data (including any other volumes, partitions, and associated drive letters on this drive), will be destroyed.$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1.) Lock and Dismount Disk - Allows ($DestDisk) to be wiped, cleaned, and partitioned.$\r$\n$\r$\n2.) NTFS Format ($DestDisk) - All Data (including any other volumes, partitions, and associated drive letters on this drive) will be Irrecoverably Deleted!$\r$\n$\r$\n3.) Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n4.) Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n5.) Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive this Drive is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions or NO to Go Back!" IDYES proceed
+ Quit
+ ${ElseIf} $FormatMeFat == "Yes" 
  MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: Backup any data on this drive before proceeding! All existing data (including any other volumes, partitions, and associated drive letters on this drive), will be destroyed.$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1.) Lock and Dismount Disk - Allows ($DestDisk) to be wiped, cleaned, and partitioned.$\r$\n$\r$\n2.) Fat32 Format ($DestDisk) - All Data (including any other volumes, partitions, and associated drive letters on this drive) will be Irrecoverably Deleted!$\r$\n$\r$\n3.) Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n4.) Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n5.) Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive this Drive is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions or NO to Go Back!" IDYES proceed
  Quit
  ${ElseIf} $FormatMe != "Yes" 
+ ${AndIf} $FormatMeFat != "Yes"
  ${AndIfNot} ${FileExists} $BootDir\multiboot\syslinux.cfg
  MessageBox MB_YESNO|MB_ICONEXCLAMATION "${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n2. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n3. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
  Quit
@@ -1289,6 +1378,8 @@ Function ConfigRemove ; Find and Set Removal Configuration file
   StrCpy $Config2Use "grubram.lst"
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\win.lst"
   StrCpy $Config2Use "win.lst"  
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\win2go.lst"
+  StrCpy $Config2Use "win2go.lst"   
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\pe.lst"
   StrCpy $Config2Use "pe.lst"  
   ${EndIf}
@@ -1320,8 +1411,10 @@ Function Config2Write
   ${WriteToSysFile} "label Unlisted ISOs (via GRUB Partition 4)$\r$\nmenu label Unlisted ISOs (via GRUB Partition 4) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/grubpart4.lst" $R0
  ${ElseIf} $Config2Use == "grubram.lst"
   ${WriteToSysFile} "label Unlisted ISOs (via GRUB from RAM)$\r$\nmenu label Unlisted ISOs (via GRUB from RAM) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/grubram.lst" $R0   
- ${ElseIf} $Config2Use == "win.lst"
+ ${ElseIf} $Config2Use == "win.lst" 
   ${WriteToSysFile} "label Windows Installers$\r$\nmenu label Windows Installers ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/win.lst" $R0  
+ ${ElseIf} $Config2Use == "win2go.lst"
+  ${WriteToSysFile} "label Windows to Go$\r$\nmenu label Windows to Go ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/win2go.lst" $R0     
  ${EndIf} 
 FunctionEnd
 
@@ -1348,6 +1441,7 @@ StrCpy $DownloadMe 0 ; Ensure Uncheck of Download Option
 StrCpy $LocalSelection "" ; Reset Local Selection
 StrCpy $ShowingAll ""
 StrCpy $FormatMe "" ; Reset Format Option
+StrCpy $FormatMeFat "" ; Reset FormatMeFat Option
     StrCmp $R8 4 0 End ;Compare $R8 variable with current page #
     StrCpy $R9 -3 ; Goes back to selections page
     Call RelGotoPage ; change pages
@@ -1377,7 +1471,9 @@ StrCpy $R9 0 ; we start on page 0
  SetShellVarContext all
  InitPluginsDir
 ;  File /oname=$PLUGINSDIR\paypal.bmp "paypal.bmp" 
+  File /oname=$PLUGINSDIR\dskvol.txt "dskvol.txt" 
   File /oname=$PLUGINSDIR\diskpart.txt "diskpart.txt" 
+  File /oname=$PLUGINSDIR\w2gdiskpart.txt "w2gdiskpart.txt"   
   File /oname=$PLUGINSDIR\dd-diskpart.txt "dd-diskpart.txt" 
   File /oname=$PLUGINSDIR\diskpartformat.txt "diskpartformat.txt"   
   File /oname=$PLUGINSDIR\diskpartdetach.txt "diskpartdetach.txt"  
@@ -1388,7 +1484,8 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\vhd.lst "menu\vhd.lst" 
   File /oname=$PLUGINSDIR\grubpart4.lst "menu\grubpart4.lst"  
   File /oname=$PLUGINSDIR\grubram.lst "menu\grubram.lst"    
-  File /oname=$PLUGINSDIR\win.lst "menu\win.lst"      
+  File /oname=$PLUGINSDIR\win.lst "menu\win.lst"  
+  File /oname=$PLUGINSDIR\win2go.lst "menu\win2go.lst"  
   File /oname=$PLUGINSDIR\grub.exe "grub.exe"  
   File /oname=$PLUGINSDIR\info "menu\info"   
   File /oname=$PLUGINSDIR\antivirus.cfg "menu\antivirus.cfg" 
@@ -1416,6 +1513,7 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\wimboot "wimboot"   
   File /oname=$PLUGINSDIR\ifcpu64.c32 "ifcpu64.c32" 
   File /oname=$PLUGINSDIR\remount.cmd "remount.cmd"  
+  File /oname=$PLUGINSDIR\boot.cmd "boot.cmd"    
   File /oname=$PLUGINSDIR\vhdremount.cmd "vhdremount.cmd"    
   File /oname=$PLUGINSDIR\ei.cfg "ei.cfg"
   File /oname=$PLUGINSDIR\dd.exe "dd.exe"

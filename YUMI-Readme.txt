@@ -28,6 +28,7 @@ Additional information for YUMI can be found HERE: https://www.pendrivelinux.com
 
 Changelog:
 
+03/03/17 Version 2.0.4.3: Add Windows to Go VHD option. Added more info for syslinux warning. Added Diskpart NTFS format option.
 02/22/17 Version 2.0.4.2: Temporarily limit format option to removable media.
 02/16/17 Version 2.0.4.1: Quick fix to address broken format option.
 02/12/17 Version 2.0.4.0: Temporarily add back Single Windows Vista/7/8/10 Installer option (which extracts all files from ISO to root). Add lock and dismount capability.

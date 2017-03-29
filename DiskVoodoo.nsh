@@ -255,10 +255,9 @@ Function UnLockVol
   Pop $7 	
 FunctionEnd 
 
-/* Function GetVolNameDSK
-nsExec::ExecToLog '"cmd" /c for /f %D in ($\'wmic volume get DriveLetter^, Label ^| find "VHD"$\') do echo %D > $BootDir\multiboot\$JustISOName\dskvol.txt'
+Function GetVolNameDSK
+nsExec::ExecToLog '"cmd" /c for /f %D in ($\'wmic volume get DriveLetter^, Label ^| find "$VHDLBL"$\') do echo %D > $BootDir\multiboot\$JustISOName\dskvol.txt'
 FileOpen $1 "$BootDir\multiboot\$JustISOName\dskvol.txt" r
 FileRead $1 $VHDDisk
 FileClose $1
-;MessageBox MB_ICONSTOP|MB_OK '$1'
-FunctionEnd */
+FunctionEnd

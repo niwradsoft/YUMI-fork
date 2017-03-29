@@ -227,11 +227,12 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Kon-Boot Purchased" "kon-boot*.exe" "NONE" "NULL" "other.cfg" "http://www.piotrbania.com/all/kon-boot/" "Kon-Boot" 
  
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
-     !insertmacro SetISOFileNames "--- Windows Installers ---" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "--- Windows to Go/Installers ---" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
 	 
  ;!insertmacro SetISOFileNames "Windows 10 Installer" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
  ; For Syslinux --- !insertmacro SetISOFileNames "Windows Vista/7/8" "*.iso" "NONE" "NULL" "other.cfg" "" ""
+ !insertmacro SetISOFileNames "Windows to Go (Virtual Hard Disk)" "*.iso" "NONE" "NULL" "win2go.lst" "" "" 
  !insertmacro SetISOFileNames "Multiple Windows Vista/7/8/10 Installers -wimboot" "*.iso" "NONE" "NULL" "win.lst" "" ""  
  !insertmacro SetISOFileNames "Multiple Windows Vista/7/8/10 Installers -bootmgr" "*.iso" "NONE" "NULL" "win.lst" "" ""   
  !insertmacro SetISOFileNames "Single Windows Vista/7/8/10 Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""  
