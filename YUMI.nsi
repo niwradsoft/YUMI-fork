@@ -14,26 +14,18 @@
   You should have received a copy of the GNU General Public License
   along with YUMI.  If not, see <http://www.gnu.org/licenses/>.
   
-  YUMI Copyright ©2011-2016 Lance http://www.pendrivelinux.com (See YUMI-Copying.txt and YUMI-Readme.txt for more information, and additional Credits)
-  7-Zip Copyright © Igor Pavlovis http://7-zip.org (unmodified binaries were used)
-  Syslinux © H. Peter Anvin http://syslinux.zytor.com (unmodified binary used)
-  Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/ (unmodified binary used)
-  grub.exe Grub4DOS © the Gna! people + Chenall https://code.google.com/p/grub4dos-chenall/ (unmodified binary used) : Official Grub4DOS: http://gna.org/projects/grub4dos/
-  Fat32format.exe © Tom Thornhill Ridgecorp Consultants http://www.ridgecrop.demon.co.uk (unmodified binary used)
-  iPXE wimboot © Michael Brown and the iPXE project team http://ipxe.org/wimboot
-  NSIS Installer © Contributors http://nsis.sourceforge.net - Install NSIS to compile this script. http://nsis.sourceforge.net/Download
-  YUMI may contain remnants of Cedric Tissieres's Tazusb.exe for Slitaz (slitaz@objectif-securite.ch), as his work was used as a base for singular distro installers that preceded YUMI. 
+  YUMI Copyright ©2011-2017 Lance https://www.pendrivelinux.com (See YUMI-Copying.txt and YUMI-Readme.txt for more information, and additional Credits)
  */
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.3.5"
+!define VERSION "2.0.3.6"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
 VIProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "pendrivelinux.com"
-VIAddVersionKey LegalCopyright "Copyright ©2016 Lance Pendrivelinux.com"
+VIAddVersionKey LegalCopyright "Copyright ©2017 Lance Pendrivelinux.com"
 VIAddVersionKey FileVersion "${VERSION}"
 VIAddVersionKey FileDescription "YUMI"
 VIAddVersionKey License "GPL Version 2"
@@ -112,6 +104,8 @@ Var OnlyVal
 Var Uninstaller
 Var Removal
 Var InUnStall
+Var InUnStalling
+Var InUnStalled
 Var OnFrom
 Var SUSEDIR
 Var RepeatInstall
@@ -129,7 +123,7 @@ Var MaxPersist
 Var Persistence
 ;Var VolMountPoint
 
-!include DiskVoodoo.nsh ; DiskVoodoo Script created by Lance http://www.pendrivelinux.com
+!include DiskVoodoo.nsh
 
 ; Interface settings
 !define MUI_FINISHPAGE_NOAUTOCLOSE
@@ -161,7 +155,7 @@ Page custom SelectionsPage
 !define MUI_FINISHPAGE_TITLE $(Finish_Title)
 !define MUI_FINISHPAGE_TEXT $(Finish_Text)
 !define MUI_FINISHPAGE_LINK $(Finish_Link)
-!define MUI_FINISHPAGE_LINK_LOCATION "http://www.pendrivelinux.com/boot-multiple-iso-from-usb-multiboot-usb/"
+!define MUI_FINISHPAGE_LINK_LOCATION "https://www.pendrivelinux.com/boot-multiple-iso-from-usb-multiboot-usb/"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "images\finish.bmp"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE Finish_PreFunction
 !insertmacro MUI_PAGE_FINISH
@@ -185,11 +179,11 @@ LangString ExecuteSyslinux ${LANG_ENGLISH} "Executing syslinux on $BootDir"
 LangString SkipSyslinux ${LANG_ENGLISH} "Good Syslinux Exists..."
 LangString WarningSyslinux ${LANG_ENGLISH} "An error ($R8) occurred while executing syslinux.$\r$\nYour USB drive won't be bootable..."
 LangString WarningSyslinuxOLD ${LANG_ENGLISH} "This YUMI revision uses a newer Syslinux version that is not compatible with earlier revisions.$\r$\nPlease ensure your USB drive doesn't contain earlier revision installs."
-LangString Install_Title ${LANG_ENGLISH} "$InUnStall $InUnName"
+LangString Install_Title ${LANG_ENGLISH} "$InUnStalling $InUnName"
 LangString Install_SubTitle ${LANG_ENGLISH} "Please wait while we $InUnStall $InUnName $OnFrom $JustDrive"
 LangString Install_Finish_Sucess ${LANG_ENGLISH} "${NAME} $InUnStalled $InUnName $OnFrom $JustDrive"
-LangString Finish_Install ${LANG_ENGLISH} "$InUnStallation Complete."
-LangString Finish_Title ${LANG_ENGLISH} "${NAME} has completed the $InUnStallation."
+LangString Finish_Install ${LANG_ENGLISH} "Process Complete."
+LangString Finish_Title ${LANG_ENGLISH} "Thanks for using ${NAME}"
 LangString Finish_Text ${LANG_ENGLISH} "Your Selections have been $InUnStalled on your USB drive.$\r$\n$\r$\nFeel Free to run this tool again to $InUnStall more Distros.$\r$\n$\r$\nYUMI will keep track of selections you have already $InUnStalled."
 LangString Finish_Link ${LANG_ENGLISH} "Visit the YUMI Home Page"
 
@@ -220,7 +214,7 @@ Function SelectionsPage
   ${NSD_CreateLabel} 0 50 50% 15 $(Distro_Text) 
   Pop $LinuxDistroSelection   
 
-  ${NSD_CreateDroplist} 0 70 55% 95 "" ; was  ${NSD_CreateListBox} ; Enable For DropBox
+  ${NSD_CreateDroplist} 0 70 58% 95 "" ; was  ${NSD_CreateListBox} ; Enable For DropBox
   Pop $Distro
   ${NSD_OnChange} $Distro OnSelectDistro
   ${NSD_CB_SelectString} $Distro $DistroName ; Was ${NSD_LB_SelectString} $Distro $DistroName  ; Enable For DropBox 
@@ -357,7 +351,7 @@ Function SelectionsPage
   ${NSD_CreateLabel} 0 50 50% 15 $(Distro_Text) 
   Pop $LinuxDistroSelection   
 
-  ${NSD_CreateDropList} 0 70 55% 95 "" ; was ${NSD_CreateListBox} ; Enable for Dropbox
+  ${NSD_CreateDropList} 0 70 58% 95 "" ; was ${NSD_CreateListBox} ; Enable for Dropbox
   Pop $Distro
   ${NSD_OnChange} $Distro OnSelectDistro
   ${NSD_CB_SelectString} $Distro $DistroName ; Was ${NSD_LB_SelectString} $Distro $DistroName  ; Enable For DropBox
@@ -476,7 +470,7 @@ FunctionEnd
 
 Function onClickMyLink
   Pop $Links ; pop something to prevent corruption
-  ExecShell "open" "http://www.pendrivelinux.com/yumi-multiboot-usb-creator/"
+  ExecShell "open" "https://www.pendrivelinux.com/yumi-multiboot-usb-creator/"
 FunctionEnd
 
 Function onClickLinuxSite
@@ -508,8 +502,10 @@ Function EnableNext ; Enable Install Button
     ${AndIf} $ISOFile != ""
      ${AndIf} $DestDrive != "" 
 	  ${AndIf} $ISOTest != ""
-  StrCpy $InUnStall "Install"	
-  StrCpy $OnFrom "on"
+  StrCpy $InUnStall "Add"	
+   StrCpy $InUnStalling "Adding"	
+    StrCpy $InUnStalled "Added"	
+  StrCpy $OnFrom "to"
   StrCpy $InUnName "$JustISOName"
   GetDlgItem $6 $HWNDPARENT 1 ; Get "Install" control handle
    SendMessage $6 ${WM_SETTEXT} 0 "STR:Create"
@@ -519,7 +515,9 @@ Function EnableNext ; Enable Install Button
    ${AndIf} $ISOFileName != ""
      ${AndIf} $DestDrive != "" 
 	  ${AndIf} $ISOTest != ""
-  StrCpy $InUnStall "Uninstall"	  
+  StrCpy $InUnStall "Remove"	
+   StrCpy $InUnStalling "Removing"	
+    StrCpy $InUnStalled "Removed"	  
   StrCpy $OnFrom "from"	
   StrCpy $InUnName "$DistroName"
   GetDlgItem $6 $HWNDPARENT 1 ; Get "Install" control handle
@@ -1112,6 +1110,12 @@ Function DoSyslinux ; Install Syslinux on USB
   SkipSyslinux: 
   DetailPrint $(SkipSyslinux)
   
+   ${IfNot} ${FileExists} $BootDir\multiboot\linux.c32 ; need linux.c32 to launch wimboot from syslinux.  
+    DetailPrint "Adding wimboot and linux.c32."   
+    CopyFiles "$PLUGINSDIR\wimboot" "$BootDir\multiboot\wimboot"
+    CopyFiles "$PLUGINSDIR\linux.c32" "$BootDir\multiboot\linux.c32"  
+   ${EndIf}      
+  
   ${If} ${FileExists} $BootDir\multiboot\syslinux.cfg    
    DetailPrint "A Previous MultiBoot Installation was detected... proceeding to add your new selections."
    Call AddDir
@@ -1127,10 +1131,8 @@ Function DoSyslinux ; Install Syslinux on USB
   CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu.c32"  
   CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\chain.c32"
   CopyFiles "$PLUGINSDIR\libcom32.c32" "$BootDir\multiboot\libcom32.c32"  
-  CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\libutil.c32"   
-  CopyFiles "$PLUGINSDIR\linux.c32" "$BootDir\multiboot\linux.c32"     
+  CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\libutil.c32"      
   CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\memdisk"
-  CopyFiles "$PLUGINSDIR\wimboot" "$BootDir\multiboot\wimboot"
  
 ; Copy these files to multiboot\menu
   ; DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
@@ -1293,7 +1295,7 @@ Function Config2Write
  ${ElseIf} $Config2Use == "grubram.lst"
   ${WriteToSysFile} "label Unlisted ISOs (via GRUB from RAM)$\r$\nmenu label Unlisted ISOs (via GRUB from RAM) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/grubram.lst" $R0   
  ${ElseIf} $Config2Use == "win.lst"
-  ${WriteToSysFile} "label Windows Installer$\r$\nmenu label Windows Installer ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/win.lst" $R0  
+  ${WriteToSysFile} "label Windows Installers$\r$\nmenu label Windows Installers ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/win.lst" $R0  
  ${EndIf} 
 FunctionEnd
 
@@ -1379,7 +1381,13 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\libutil.c32 "libutil.c32"   
   File /oname=$PLUGINSDIR\linux.c32 "linux.c32"  
   File /oname=$PLUGINSDIR\wimboot "wimboot"   
-  File /oname=$PLUGINSDIR\ifcpu64.c32 "ifcpu64.c32"     
+  File /oname=$PLUGINSDIR\ifcpu64.c32 "ifcpu64.c32" 
+  File /oname=$PLUGINSDIR\remount.cmd "remount.cmd"   
+  File /oname=$PLUGINSDIR\ei.cfg "ei.cfg"
+  
+  SetOutPath "$PLUGINSDIR"  
+  File /r "wimlib" 
+  SetOutPath ""  
 FunctionEnd
 
 Function onNotify_CasperSlider

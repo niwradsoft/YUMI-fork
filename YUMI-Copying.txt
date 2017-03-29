@@ -30,10 +30,11 @@ Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/
 dd.exe © John Newbigin http://www.chrysocome.net/
 mke2fs © Matt <mattwu@163.com> http://www.ext2fsd.com
 iPXE wimboot © Michael Brown and the iPXE project team http://ipxe.org/wimboot
+Wimlib Copyright © Eric Biggers https://wimlib.net/
 
 YUMI, GRUB4DOS, Fat32format, dd, mke2fs, wimboot, and Syslinux covered under GNU GPL version 2
 7-zip is covered under an LGPL + AES License - see the License following GNU GPL 2
-Firadisk is covered under GNU GPL version 3
+Firadisk is covered under GNU GPL version 3. Wimlib is covered under GNU GPL 3 + GNU LGPL License
 
 ----------------------------------------------------------------------------------------------------
 
@@ -941,3 +942,5 @@ necessary.  Here is a sample; alter the names:
   Ty Coon, President of Vice
 
 That's all there is to it!		
+
+-------------------------------------------------------------------------------------------------

@@ -286,24 +286,84 @@ FunctionEnd
  CopyFiles "$PLUGINSDIR\WDO.lst" "$BootDir\multiboot\menu\WDO.lst" 
  !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\menu\WDO.lst"  
  
-; Windows 10
- ${ElseIf} $DistroName == "Windows 10 Installer"
- ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\" -y -x![BOOT]*' 
- ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName$\r$\nchainloader /bootmgr$\r$\n#end $JustISOName" $R0  
+; Windows (WIM) boot
+ ${ElseIf} $DistroName == "Multiple Windows Vista/7/8/10 Installers -wimboot"
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]*' 
+ ; ${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nCOM32 linux.c32$\r$\nappend wimboot initrdfile=$JustISOName/bootmgr,$JustISOName/boot/bcd,$JustISOName/boot/boot.sdi,$JustISOName/sources/boot.wim$\r$\n#end $JustISOName" $R0
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName - wimboot$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --hook$\r$\nkernel (hd1,0)/multiboot/wimboot$\r$\nkernel (hd1,0)/multiboot/wimboot$\r$\ninitrd @bootmgr=(hd1,0)/multiboot/$JustISOName/bootmgr @bcd=(hd1,0)/multiboot/$JustISOName/boot/bcd @boot.sdi=(hd1,0)/multiboot/$JustISOName/boot/boot.sdi @boot.wim=(hd1,0)/multiboot/$JustISOName/sources/boot.wim$\r$\n#end $JustISOName" $R0   
+  CopyFiles "$PLUGINSDIR\remount.cmd" "$BootDir\multiboot\$JustISOName\remount.cmd"    
+  CopyFiles "$PLUGINSDIR\ei.cfg" "$BootDir\multiboot\$JustISOName\sources\ei.cfg"	  
+  CopyFiles "$PLUGINSDIR\wimlib\stuff\autounattend.xml" "$BootDir\multiboot\$JustISOName\autounattend.xml"   
+  CopyFiles "$PLUGINSDIR\wimlib\stuff\au.txt" "$BootDir\multiboot\$JustISOName\au.txt"   
+  !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\remount.cmd"  
+  !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\autounattend.xml"  
+  !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+  !insertmacro ReplaceInFile "BOOTDIRSLUG" "$BootDir" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"     
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  !insertmacro ReplaceInFile "$BootDir" "BOOTDIRSLUG" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt" 
  
-; Windows Vista/7/8
- ${ElseIf} $DistroName == "Windows Vista/7/8 Installer"
+; Windows - bootmgr at root of USB
+ ${ElseIf} $DistroName == "Multiple Windows Vista/7/8/10 Installers -bootmgr"
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]*'    
+ 
+  ${IfNot} ${FileExists} "$BootDir\multiboot\$JustISOName\efi\microsoft\boot\bcd"
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName - bootmgr at root$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
+  ${Else} ; For 32bit variants
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName - bootmgr at root$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
+  ${Endif}
+  CopyFiles "$PLUGINSDIR\remount.cmd" "$BootDir\multiboot\$JustISOName\remount.cmd"    
+  CopyFiles "$PLUGINSDIR\ei.cfg" "$BootDir\multiboot\$JustISOName\sources\ei.cfg"	  
+  CopyFiles "$PLUGINSDIR\wimlib\stuff\autounattend.xml" "$BootDir\multiboot\$JustISOName\autounattend.xml"   
+  CopyFiles "$PLUGINSDIR\wimlib\stuff\au.txt" "$BootDir\multiboot\$JustISOName\au.txt"     
+  !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\remount.cmd"  
+  !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\autounattend.xml"  
+  !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+  !insertmacro ReplaceInFile "BOOTDIRSLUG" "$BootDir" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  !insertmacro ReplaceInFile "$BootDir" "BOOTDIRSLUG" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+  
+/*   ${IfNot} ${FileExists} "$BootDir\autounattend.xml" 
+  CopyFiles "$PLUGINSDIR\autounattend.xml" "$BootDir\autounattend.xml"  
+  ${Endif}   */
+
+ !include "x64.nsh"
+ ${DisableX64FSRedirection} 
+ DetailPrint "bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}" 
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ DetailPrint "bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}"
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ DetailPrint 'bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ DetailPrint 'bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}' 
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ ${EnableX64FSRedirection} 
+ 
+  ${IfNot} ${FileExists} "$BootDir\boot\bcd"
+      CreateDirectory $BootDir\boot
+	  CopyFiles $BootDir\multiboot\$JustISOName\boot\boot.sdi "$BootDir\boot\bcd" ;just copying a file large enough in size to be used for our bcd container...
+	  CopyFiles $BootDir\multiboot\$JustISOName\boot\boot.sdi "$BootDir\boot"		  
+   ${AndIfNot} ${FileExists} "$BootDir\efi\microsoft\boot\bcd"  
+      CreateDirectory $BootDir\efi\microsoft\boot	
+	  CopyFiles $BootDir\multiboot\$JustISOName\efi\microsoft\boot\bcd "$BootDir\efi\microsoft\boot"  
+   ${AndIfNot} ${FileExists} "$BootDir\bootmgr"  
+      CopyFiles $BootDir\multiboot\$JustISOName\bootmgr "$BootDir\bootmgr" 
+   ${AndIfNot} ${FileExists} "$BootDir\bootmgr.efi" 	  
+      CopyFiles $BootDir\multiboot\$JustISOName\bootmgr.efi "$BootDir\bootmgr.efi"  
+  ${EndIf}   
+ 
+; Windows Vista/7/8/10
+ ${ElseIf} $DistroName == "Single Windows Vista/7/8/10 Installer"
  ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\" -y -x![BOOT]*' 
 ; For Syslinux ---- ${WriteToFile} "#start $JustISOName$\r$\nLABEL Windows Vista/7/8 Installer$\r$\nMENU LABEL Windows Vista/7/8/10 Installer$\r$\nMENU INDENT 1$\r$\nCOM32 /multiboot/chain.c32 fs ntldr=/bootmgr$\r$\n#end $JustISOName" $R0  
 ; CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO"
- ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName$\r$\nchainloader /bootmgr$\r$\n#end $JustISOName" $R0  
+ ${WriteToFile} "title$\r$\nroot$\r$\n#start $JustISOName$\r$\ntitle Start $JustISOName Installer$\r$\nchainloader /bootmgr$\r$\n#end $JustISOName" $R0  
 ; File /oname=$PLUGINSDIR\firadisk.img "firadisk.img"  
 ; CopyFiles "$PLUGINSDIR\firadisk.img" "$BootDir\multiboot\ISOS\firadisk.img"   
 
 ; Windows XP
  ${ElseIf} $DistroName == "Windows XP Installer" 
  CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO"
- ${WriteToFile} "#start $JustISOName$\r$\ntitle Begin Install of Windows XP from $JustISO (Stage 1)$\r$\nfind --set-root /multiboot/ISOS/$JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --mem /multiboot/ISOS/firadisk.img (fd0)$\r$\nmap --mem /multiboot/ISOS/firadisk.img (fd1)$\r$\nmap --mem /multiboot/ISOS/$JustISO (0xff)$\r$\nmap --hook$\r$\nchainloader (0xff)/I386/SETUPLDR.BIN$\r$\n$\r$\ntitle Continue Windows XP Install from $JustISO (Stage 2)$\r$\nfind --set-root /multiboot/ISOS/$JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --mem /multiboot/ISOS/$JustISO (0xff)$\r$\nmap --hook$\r$\nchainloader (hd0)+1$\r$\n$\r$\ntitle Boot Windows XP - If fails, reboot with USB removed (Stage 3)$\r$\nmap (hd1) (hd0)$\r$\nmap (hd0) (hd1)$\r$\nroot (hd1,0)$\r$\nfind --set-root /ntldr$\r$\nchainloader /ntldr$\r$\n#end $JustISOName" $R0  
+ ${WriteToFile} "title$\r$\nroot$\r$\n#start $JustISOName$\r$\ntitle Begin Install of Windows XP from $JustISO (Stage 1)$\r$\nfind --set-root /multiboot/ISOS/$JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --mem /multiboot/ISOS/firadisk.img (fd0)$\r$\nmap --mem /multiboot/ISOS/firadisk.img (fd1)$\r$\nmap --mem /multiboot/ISOS/$JustISO (0xff)$\r$\nmap --hook$\r$\nchainloader (0xff)/I386/SETUPLDR.BIN$\r$\n$\r$\ntitle Continue Windows XP Install from $JustISO (Stage 2)$\r$\nfind --set-root /multiboot/ISOS/$JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --mem /multiboot/ISOS/$JustISO (0xff)$\r$\nmap --hook$\r$\nchainloader (hd0)+1$\r$\n$\r$\ntitle Boot Windows XP - If fails, reboot with USB removed (Stage 3)$\r$\nmap (hd1) (hd0)$\r$\nmap (hd0) (hd1)$\r$\nroot (hd1,0)$\r$\nfind --set-root /ntldr$\r$\nchainloader /ntldr$\r$\n#end $JustISOName" $R0  
  File /oname=$PLUGINSDIR\firadisk.img "firadisk.img"  
  CopyFiles "$PLUGINSDIR\firadisk.img" "$BootDir\multiboot\ISOS\firadisk.img"   
  

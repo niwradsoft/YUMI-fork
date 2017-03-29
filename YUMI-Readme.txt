@@ -1,4 +1,4 @@
-YUMI ©2011-2016 Lance https://www.pendrivelinux.com (covered under GNU GPL License) - see YUMI-Copying
+YUMI ©2011-2017 Lance https://www.pendrivelinux.com (covered under GNU GPL License) - see YUMI-Copying
 
 Background of YUMI (Your Universal Multiboot Integrator):
 
@@ -22,11 +22,13 @@ Credits, Resources, and Third Party Tools used:
 * mke2fs © Matt <mattwu@163.com> http://www.ext2fsd.com (unmodified binary used)
 * Tuffy Font © Thatcher Ulrich http://tulrich.com/fonts/ (unmodified binary used)
 * iPXE wimboot © Michael Brown and the iPXE project team http://ipxe.org/wimboot (unmodified binary used)
+* Wimlib Copyright © Eric Biggers https://wimlib.net/ (unmodified binary used)
 
 Additional information for YUMI can be found HERE: https://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 Changelog:
 
+01/14/17 Version 2.0.3.6: Update to support multiple Windows Vista/7/8/10 Installers. -wimboot option stores the extracted Windows Installers in their own directory. -bootmgr option moves only bootmgr and bcd to root of drive. (note: -bootmgr option does require a Windows Vista or later host to run bcdedit).
 12/27/16 Version 2.0.3.5: Fix to replace empty spaces in Distro filename with dashes. Add Windows PE (WIM) boot options (unfinished). Implement wimboot capabilities, Switch to newer Grub4Dos. Update labels.
 12/22/16 Version 2.0.3.4: Quick fix to correct the double Distro list during step 2.
 12/19/16 Version 2.0.3.3: Update Get Drives function to ignore system and network drives on subsequent YUMI installs. Corrected UI vesamenu paths.
