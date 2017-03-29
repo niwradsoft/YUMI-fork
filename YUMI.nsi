@@ -26,7 +26,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.3.2"
+!define VERSION "2.0.3.3"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -275,7 +275,7 @@ Function SelectionsPage
   Pop $DestDriveTxt 
   
    ${If} $ShowAll == "YES"
-   ${GetDrives} "ALL" DrivesList ; All Drives Listed
+   ${GetDrives} "FDD+HDD" DrivesList ; All Drives Listed
    ${ElseIf} $ShowAll == "NO"
    ${GetDrives} "FDD" DrivesList ; FDD+HDD reduced to FDD for removable media only
    ${EndIf}
@@ -909,14 +909,14 @@ Function FormatIt ; Set Format Option
   ${NSD_Check} $Format
     StrCpy $FormatMe "Yes"
   ${NSD_SetText} $Format "We Will Fat32 Format $DestDisk Drive!"
-    SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
+    ;SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
 	ShowWindow $Uninstaller 0 ; Disable Uninstaller option because we will be formatting the drive.
     StrCpy $Checker "Yes"	
   
   ${ElseIf} $FormatMe == ${BST_UNCHECKED}
   ${NSD_Uncheck} $Format 
   ${NSD_SetText} $Format "Format $DestDisk Drive (Erase Content)?"  
-    SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
+    ;SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
     ShowWindow $Uninstaller 1 ; Re-enable Uninstaller option.
 	StrCpy $Checker "Yes" 
 	Call SetSpace
@@ -1108,13 +1108,13 @@ Function DoSyslinux ; Install Syslinux on USB
   CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\libutil.c32"   
   CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\memdisk"
 ; Copy these files to multiboot\menu
-  DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
-  CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
-  CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu\menu.c32"  
-  CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\menu\chain.c32"
-  CopyFiles "$PLUGINSDIR\libcom32.c32" "$BootDir\multiboot\menu\libcom32.c32"  
-  CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\menu\libutil.c32"   
-  CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\menu\memdisk"   
+  ; DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
+  ; CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
+  ; CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu\menu.c32"  
+  ; CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\menu\chain.c32"
+  ; CopyFiles "$PLUGINSDIR\libcom32.c32" "$BootDir\multiboot\menu\libcom32.c32"  
+  ; CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\menu\libutil.c32"   
+  ; CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\menu\memdisk"   
   
   Call AddDir    
   ${EndIf}  
@@ -1132,23 +1132,23 @@ Function DoSyslinux ; Install Syslinux on USB
   CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\libutil.c32"   
   CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\memdisk"
 ; Copy these files to multiboot\menu
-  DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
-  CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
-  CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu\menu.c32"  
-  CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\menu\chain.c32"
-  CopyFiles "$PLUGINSDIR\libcom32.c32" "$BootDir\multiboot\menu\libcom32.c32"  
-  CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\menu\libutil.c32"   
-  CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\menu\memdisk"   
+  ; DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
+  ; CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
+  ; CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu\menu.c32"  
+  ; CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\menu\chain.c32"
+  ; CopyFiles "$PLUGINSDIR\libcom32.c32" "$BootDir\multiboot\menu\libcom32.c32"  
+  ; CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\menu\libutil.c32"   
+  ; CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\menu\memdisk"   
  ${EndIf}  
   
-  ${IfNot} ${FileExists} $BootDir\multiboot\menu\vesamenu.c32
-; Copy these files to multiboot\menu
-  DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
-  CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
-  CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu\menu.c32"  
-  CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\menu\chain.c32"
-  CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\menu\memdisk"   
-  ${EndIf}    
+  ; ${IfNot} ${FileExists} $BootDir\multiboot\menu\vesamenu.c32
+;; Copy these files to multiboot\menu
+  ; DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
+  ; CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
+  ; CopyFiles "$PLUGINSDIR\menu.c32" "$BootDir\multiboot\menu\menu.c32"  
+  ; CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\menu\chain.c32"
+  ; CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\menu\memdisk"   
+  ; ${EndIf}    
 
 ; Check to ensure menu.c32 exists... now required for YUMI V2
   ${IfNot} ${FileExists} $BootDir\multiboot\menu.c32
