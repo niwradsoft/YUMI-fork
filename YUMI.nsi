@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.4"
+!define VERSION "2.0.4.5"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -134,6 +134,9 @@ Var VHDDisk
 Var VHDSize
 Var VHDLBL
 Var FSType
+Var CasperName
+Var COMSPEC
+Var PERCENT
 
 !include DiskVoodoo.nsh
 
@@ -189,7 +192,7 @@ LangString Extract ${LANG_ENGLISH} "Extracting the $FileFormat: The progress bar
 LangString CreateSysConfig ${LANG_ENGLISH} "Creating configuration files for $DestDisk"
 LangString ExecuteSyslinux ${LANG_ENGLISH} "Executing syslinux on $BootDir"
 LangString SkipSyslinux ${LANG_ENGLISH} "Good Syslinux Exists..."
-LangString WarningSyslinux ${LANG_ENGLISH} "An error ($R8) occurred while executing syslinux.$\r$\nYour USB drive won't be bootable...$\r$\n$\r$\nCheck to make sure your drive is formatted as Fat32 or NTFS."
+LangString WarningSyslinux ${LANG_ENGLISH} "An error ($R8) occurred while executing syslinux.$\r$\nYour USB drive won't be bootable...$\r$\n$\r$\n$FSType filesystem detected. Your drive must be formatted as Fat32 or NTFS."
 LangString WarningSyslinuxOLD ${LANG_ENGLISH} "This YUMI revision uses a newer Syslinux version that is not compatible with earlier revisions.$\r$\nPlease ensure your USB drive doesn't contain earlier revision installs."
 LangString Install_Title ${LANG_ENGLISH} "$InUnStalling $InUnName"
 LangString Install_SubTitle ${LANG_ENGLISH} "Please wait while we $InUnStall $InUnName $OnFrom $JustDrive"
@@ -281,7 +284,7 @@ Function SelectionsPage
   Pop $LabelDrivePage 
   ${NSD_SetText} $LabelDrivePage "Step 1: YUMI Summoned $DestDisk as your USB Device"  
 ; Droplist for Drive Selection  
-  ${NSD_CreateDropList} 0 20 28% 15 "" ; was 0 20 28% 15
+  ${NSD_CreateDropList} 0 20 35% 15 "" ; was 0 20 28% 15
   Pop $DestDriveTxt 
   
    ${If} $ShowAll == "YES"
@@ -623,7 +626,7 @@ Function EnableNext ; Enable Install Button
   ${If} $Persistence == "casper" ; If can use Casper Persistence... 
   ${AndIf} $TheISO != ""
   ${AndIf} $BootDir != "" 
-  ${AndIf} $FSType != "NTFS" ; prevent casper if NTFS... implement fix for this later.
+  ;${AndIf} $FSType != "NTFS" ; prevent casper if NTFS... implement fix for this later.
   ShowWindow $CasperSelection 1
   ShowWindow $CasperSlider 1
   ShowWindow $SlideSpot 1
@@ -919,6 +922,12 @@ Function OnSelectDrive
   StrCpy $BootDir $DestDrive 2 ;was -1 
   StrCpy $DestDisk $DestDrive 2 ;was -1
   StrCpy $HDDUSB $Letters "" -3 
+  
+  StrCpy $9 $JustDrive
+  Call GetFSType
+  ${NSD_SetText} $LabelDrivePage "Step 1: You Selected $DestDisk as your USB Device"   
+  ;MessageBox MB_ICONSTOP|MB_OK " $9 $FSType" 
+  
   SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new drive may have been chosen ; Enable for DropBox
   StrCpy $Checker "Yes" 
   Call InstallorRemove
@@ -926,13 +935,10 @@ Function OnSelectDrive
   Call CheckSpace
   Call FormatIt  
   Call EnableNext
- 
-  ${NSD_SetText} $LabelDrivePage "Step 1: You Selected $DestDisk as your USB Device"   
-  
-;  ${If} ${FileExists} $BootDir\menu.lst
-;  ${AndIf} ${FileExists} $BootDir\syslinux.cfg
-;  MessageBox MB_ICONQUESTION|MB_OK "It appears MultibootISOs was previously used on this drive? To use YUMI on this device, you must format the drive."
-;  ${EndIf}
+
+  ${If} $FSType == "exFAT"
+  MessageBox MB_ICONSTOP|MB_OK "WARNING! Syslinux won't work on exFAT formatted devices. Please format $DestDisk Fat32 or NTFS."
+  ${EndIf} 
 FunctionEnd
 
 Function GetDiskVolumeName
@@ -955,7 +961,7 @@ ${Else}
 ${EndIf}
 
 StrCpy $2 "$2"
-FunctionEnd ; GetDiskVolumeName
+FunctionEnd 
 
 Function DiskSpace
 ${DriveSpace} "$9" "/D=T /S=G" $1 ; used to find total space of each drive
@@ -1029,7 +1035,7 @@ Function FormatIt ; Set Format Option
   ${NSD_SetText} $FormatFat "Fat32 Format $DestDisk (Wipes Drive)"  
    ShowWindow $Uninstaller 1 ; Re-enable Uninstaller option.
    StrCpy $Checker "Yes" 
-   Call SetSpace
+   ;Call SetSpace
   ${EndIf}    
 
   ${NSD_GetState} $Format $FormatMe
@@ -1040,15 +1046,16 @@ Function FormatIt ; Set Format Option
   ${NSD_SetText} $Format "We Will NTFS Format $DestDisk"
 	ShowWindow $Uninstaller 0 ; Disable Uninstaller option because we will be formatting the drive.
     StrCpy $Checker "Yes"	
-	Call SetSpace
+	;Call SetSpace
   ${ElseIf} $FormatMe == ${BST_UNCHECKED}
   ${NSD_Uncheck} $Format
    ShowWindow $FormatFat 1
   ${NSD_SetText} $Format "NTFS Format $DestDisk (Wipes Drive)"  
     ShowWindow $Uninstaller 1 ; Re-enable Uninstaller option.
 	StrCpy $Checker "Yes" 
-	Call SetSpace
+	;Call SetSpace
   ${EndIf}  
+    Call SetSpace
     Call InstallorRemove
 FunctionEnd
 
@@ -1101,22 +1108,29 @@ ${EndIf}
 FunctionEnd
 
 Function SetSpace ; Set space available for persistence
-${If} $FormatMe != "Yes"
-${AndIf} $FormatMeFat != "Yes"
-  ;StrCpy $0 '$0'
+ ${If} $FSType != "NTFS"
+ ${OrIf} $FormatMeFat == "Yes"
+ ${AndIf} $FormatMe != "Yes"
+ 
+  ;MessageBox MB_ICONSTOP|MB_OK "$Casper - $FormatMeFat"
   Call FreeDiskSpace
   IntOp $MaxPersist 4090 + $CasperSize ; Space required for distro and 4GB max persistent file
- ${If} $1 > $MaxPersist ; Check if more space is available than we need for distro + 4GB persistent file
+  ${If} $1 > $MaxPersist ; Check if more space is available than we need for distro + 4GB persistent file
   StrCpy $RemainingSpace 4090 ; Set maximum possible value to 4090 MB (any larger wont work on fat32 Filesystem)
- ${Else}
+  ${Else}
   StrCpy $RemainingSpace "$1"
   IntOp $RemainingSpace $RemainingSpace - $SizeOfCasper ; Remaining space minus distro size
- ${EndIf}
+  ${EndIf}
   IntOp $RemainingSpace $RemainingSpace - 1 ; Subtract 1MB so that we don't error for not having enough space
   SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 $RemainingSpace ; Re-Setting Max Value
-${Else}
- SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 4090 ; Re-Setting Max Value
-${EndIf}   
+  
+ ${Else}  
+  Call FreeDiskSpace
+  StrCpy $RemainingSpace "$1"
+  IntOp $RemainingSpace $RemainingSpace - $SizeOfCasper ; Remaining space minus distro size
+  IntOp $RemainingSpace $RemainingSpace - 1 ; Subtract 1MB so that we don't error for not having enough space
+  SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 $RemainingSpace ; Re-Setting Max Value 
+ ${EndIf} 
 FunctionEnd
 
 Function HaveSpacePre ; Check space required
@@ -1215,9 +1229,12 @@ Function DoSyslinux ; Install Syslinux on USB
   CreateDirectory $BootDir\multiboot\menu ; recursively create the directory structure if it doesn't exist
   CreateDirectory $BootDir\multiboot\ISOS ; create ISOS folder  
   DetailPrint $(ExecuteSyslinux)
-  ExecWait '$PLUGINSDIR\syslinux.exe -maf -d /multiboot $BootDir' $R8
+  ;ExecWait '$PLUGINSDIR\syslinux.exe -maf -d /multiboot $BootDir' $R8
+  ;DetailPrint "Syslinux Errors $R8"
+  nsExec::Exec '"$PLUGINSDIR\syslinux.exe" -maf -d /multiboot $BootDir'
+  Pop $R8
   DetailPrint "Syslinux Errors $R8"
-  Banner::destroy
+  
   ${If} $R8 != 0
   MessageBox MB_ICONEXCLAMATION|MB_OK $(WarningSyslinux)
   ${EndIf} 

@@ -218,6 +218,83 @@ FunctionEnd
  ;Call OldSysFix  ; Check for and replace vesamenu.c32, menu.c32, chain.c32 if found 
  ;${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nCONFIG /boot/isolinux/isolinux.cfg$\r$\nAPPEND /boot/isolinux$\r$\n#end $JustISOName" $R0
  
+  ${ElseIf} $DistroName == "Ubuntu" 
+  ${OrIf} $DistroName == "Edubuntu" 
+  ${OrIf} $DistroName == "Xubuntu" 
+   ${OrIf} $DistroName == "Kubuntu" 
+    ${OrIf} $DistroName == "Lubuntu" 
+	 ${OrIf} $DistroName == "Ubuntu Mate" 
+      ${OrIf} $DistroName == "Ubuntu Gnome" 	   
+	   ${OrIf} $DistroName == "Linux Mint" 
+	   	;${OrIf} $DistroName == "Debian Live"
+		 
+  ${If} $FSType == "NTFS" 
+  ${OrIf} $FormatMe == "Yes" ; Only perform these actions if FS is or will be NTFS
+  ${AndIf} $FormatMeFat != "Yes"
+  
+   ; Create Casper RW  
+   ${If} $Persistence == "casper"
+   ${AndIf} $Casper != "0"  
+   ; Create Casper-rw file
+   Call CasperScriptAlt1   
+   ${EndIf}   
+   
+  CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+  ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!vmlinu* -ir!init* -o"$BootDir\multiboot\$JustISOName\" -y'
+  File /oname=$PLUGINSDIR\ubuntu.lst "Menu\ubuntu.lst"  
+  CopyFiles "$PLUGINSDIR\ubuntu.lst" "$BootDir\multiboot\$JustISOName\ubuntu.lst"   
+  ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/ubuntu.lst$\r$\n#end $JustISOName" $R0   
+ 
+   ${If} $DistroName == "Ubuntu"
+    !insertmacro ReplaceInFile "SLEED" "ubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
+    ${ElseIf} $DistroName == "Edubuntu"
+    !insertmacro ReplaceInFile "SLEED" "edubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"  
+    ${ElseIf} $DistroName == "Xubuntu"
+    !insertmacro ReplaceInFile "SLEED" "xubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"  
+    ${ElseIf} $DistroName == "Kubuntu"
+    !insertmacro ReplaceInFile "SLEED" "kubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+    ${ElseIf} $DistroName == "Lubuntu"
+    !insertmacro ReplaceInFile "SLEED" "lubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 	
+    ${ElseIf} $DistroName == "Ubuntu Gnome"
+    !insertmacro ReplaceInFile "SLEED" "ubuntu-gnome.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"	
+    ${ElseIf} $DistroName == "Ubuntu Mate"
+    !insertmacro ReplaceInFile "SLEED" "ubuntu-mate.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"		
+    ${ElseIf} $DistroName == "Linux Mint"
+    !insertmacro ReplaceInFile "SLEED" "linuxmint.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 		
+    ${EndIf}
+	
+  !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
+  !insertmacro ReplaceInFile "DLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+  
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz.efi"
+  !insertmacro ReplaceInFile "VLUG" "vmlinuz.efi" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz"
+  !insertmacro ReplaceInFile "VLUG" "vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"   
+  ${EndIf}  
+  
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.lz"  
+  !insertmacro ReplaceInFile "ILUG" "initrd.lz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.gz"  
+  !insertmacro ReplaceInFile "ILUG" "initrd.gz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+  ${EndIf}  
+   
+  ; Enable Persistence
+    ${If} $Persistence == "casper"
+    ${AndIf} $Casper != "0"  
+    ; Add Boot Code Persistent
+    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\ubuntu.lst" ; Rename the following
+    !insertmacro ReplaceInFile "noprompt boot=" "noprompt persistent boot=" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+	!insertmacro ReplaceInFile "#CLUG" "parttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4%$\r$\nif $\"%check%$\"==$\"0x00$\" partnew (hd0,3) 0 0 0$\r$\nif NOT $\"%check%$\"==$\"0x00$\" echo ERROR: third partion table is not empty, please delete it if you wish to use this method && pause --wait=5 && configfile /multiboot/$JustISOName/ubuntu.lst$\r$\npartnew (hd0,3) 0x00 %CASPER%$\r$\nmap %CASPER% (hd0,3)" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
+    ${EndIf} 
+   ${EndIf} 
+   ${Else}
+     ${If} $DistroName == "Linux Mint" 
+     Goto LinuxMINT
+	 ${Else}
+	 Goto Else
+	 ${EndIf} 
+   ${EndIf}    
+ 
 ; Linux Mint (New Method) 
  ${ElseIf} $DistroName == "Linux Mint"
   ${OrIf} $DistroName == "AVIRA AntiVir Rescue CD (Virus Scanner)"
@@ -225,12 +302,16 @@ FunctionEnd
  ${AndIfNot} $JustISO == "linuxmint-201403-cinnamon-dvd-32bit.iso"
  ${AndIfNot} $JustISO == "linuxmint-201403-mate-dvd-32bit.iso" 
  ${AndIfNot} $JustISO == "linuxmint-201403-cinnamon-dvd-64bit.iso"
- ${AndIfNot} $JustISO == "linuxmint-201403-mate-dvd-64bit.iso"  
- CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
- ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!*nitrd.* -ir!*mlinu* -o"$BootDir\multiboot\$JustISOName\" -y'  
- Rename "$BootDir\multiboot\$JustISOName\initrd.gz" "$BootDir\multiboot\$JustISOName\initrd.lz" 
- Rename "$BootDir\multiboot\$JustISOName\vmlinuz.efi" "$BootDir\multiboot\$JustISOName\vmlinuz" 
- ${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/$JustISOName/vmlinuz$\r$\nAPPEND initrd=/multiboot/$JustISOName/initrd.lz cdrom-detect/try-usb=true persistent persistent-path=/multiboot/$JustISOName noprompt splash boot=casper iso-scan/filename=/multiboot/$JustISOName/$JustISO$\r$\n#end $JustISOName" $R0
+ ${AndIfNot} $JustISO == "linuxmint-201403-mate-dvd-64bit.iso" 
+   LinuxMINT:
+   ${If} $FSType != "NTFS" 
+   ${OrIf} $FormatMeFat == "Yes"
+   CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+   ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!*nitrd.* -ir!*mlinu* -o"$BootDir\multiboot\$JustISOName\" -y'  
+   Rename "$BootDir\multiboot\$JustISOName\initrd.gz" "$BootDir\multiboot\$JustISOName\initrd.lz" 
+   Rename "$BootDir\multiboot\$JustISOName\vmlinuz.efi" "$BootDir\multiboot\$JustISOName\vmlinuz" 
+   ${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/$JustISOName/vmlinuz$\r$\nAPPEND initrd=/multiboot/$JustISOName/initrd.lz cdrom-detect/try-usb=true persistent persistent-path=/multiboot/$JustISOName noprompt splash boot=casper iso-scan/filename=/multiboot/$JustISOName/$JustISO$\r$\n#end $JustISOName" $R0
+   ${EndIf} 
  
 ; OpenSUSE 32bit 
  ${ElseIf} $DistroName == "OpenSUSE 32bit"
@@ -658,6 +739,7 @@ ${EndIf}
 ; ${WriteToFile} "#start $JustISOName$\r$\nLABEL Vba32 Rescue ($JustISOName)$\r$\nMENU LABEL Vba32 Rescue ($JustISOName)$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/$JustISOName/vba/kernel$\r$\nAPPEND initrd=/multiboot/$JustISOName/vba/initrd$\r$\n#end $JustISOName" $R0
  
  ${Else}
+ Else:
 ; Start Catch All Install Methods 
  ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -x![BOOT] -o"$BootDir\multiboot\$JustISOName\" -y'  
  Call FindConfig
@@ -1574,6 +1656,9 @@ ${EndIf}
  ${EndIf}   
 
 ; Enable Casper  
+ ${If} $FSType != "NTFS" 
+ ${OrIf} $FormatMeFat == "Yes"
+   
   ${If} $Persistence == "casper" ; Casper
   ${AndIf} $Casper != "0" ; Casper Slider (Size) was not Null
   ; Add Boot Code Persistent
@@ -1588,8 +1673,9 @@ ${EndIf}
   !insertmacro ReplaceInFile "cdrom-detect/try-usb=true noprompt" "cdrom-detect/try-usb=true persistent persistent-path=/multiboot/$JustISOName noprompt" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg"  
   ${EndIf} 
 ; Create Casper-rw file
-  Call CasperScript  
- ${EndIf}
+  Call CasperScriptAlt1  
+  ${EndIf}
+ ${EndIf} 
  
 Call WriteStuff
 

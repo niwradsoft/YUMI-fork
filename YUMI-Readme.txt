@@ -28,6 +28,7 @@ Additional information for YUMI can be found HERE: https://www.pendrivelinux.com
 
 Changelog:
 
+03/22/17 Version 2.0.4.5: Add ability to create larger than 4GB casper-rw persistent file if using NTFS format for Ubuntu and Linux Mint - (creates 4th partition table). Added casper-rw creation progress banner.
 03/13/17 Version 2.0.4.4: Add filesystem type to drivelist. Include messagebox to notify of NTFS filesystem requirement for Windows to Go option.
 03/03/17 Version 2.0.4.3: Add Windows to Go VHD option. Added more info for syslinux warning. Added Diskpart NTFS format option.
 02/22/17 Version 2.0.4.2: Temporarily limit format option to removable media.
