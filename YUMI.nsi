@@ -26,7 +26,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.3.1"
+!define VERSION "2.0.3.2"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -99,8 +99,8 @@ Var LocalSelection
 Var Letters
 Var Config2Use
 Var SomeFileExt
-;Var AllDriveOption
-;Var DisplayAll
+Var AllDriveOption
+Var DisplayAll
 Var DistroLink
 Var Homepage
 Var OfficialSite
@@ -112,7 +112,7 @@ Var Removal
 Var InUnStall
 Var SUSEDIR
 Var RepeatInstall
-;Var ShowAll
+Var ShowAll
 Var ForceShowAll
 Var ShowingAll
 
@@ -124,7 +124,7 @@ Var SlideSpot
 Var RemainingSpace
 Var MaxPersist
 Var Persistence
-Var VolMountPoint
+;Var VolMountPoint
 
 !include DiskVoodoo.nsh ; DiskVoodoo Script created by Lance http://www.pendrivelinux.com
 
@@ -271,14 +271,14 @@ Function SelectionsPage
   Pop $LabelDrivePage 
   ${NSD_SetText} $LabelDrivePage "Step 1: YUMI Summoned $DestDisk as your USB Device"  
 ; Droplist for Drive Selection  
-  ${NSD_CreateDropList} 0 20 40% 15 "" ; was 0 20 28% 15
+  ${NSD_CreateDropList} 0 20 28% 15 "" ; was 0 20 28% 15
   Pop $DestDriveTxt 
   
-   ;${If} $ShowAll == "YES"
-   ;${GetDrives} "ALL" DrivesList ; All Drives Listed
-   ;${ElseIf} $ShowAll == "NO"
-   ;${GetDrives} "FDD" DrivesList ; FDD+HDD reduced to FDD for removable media only
-   ;${EndIf}
+   ${If} $ShowAll == "YES"
+   ${GetDrives} "ALL" DrivesList ; All Drives Listed
+   ${ElseIf} $ShowAll == "NO"
+   ${GetDrives} "FDD" DrivesList ; FDD+HDD reduced to FDD for removable media only
+   ${EndIf}
   
   ${NSD_CB_SelectString} $DestDriveTxt "$DestDrive"
   StrCpy $JustDrive $DestDrive 3
@@ -293,9 +293,9 @@ Function SelectionsPage
   ${NSD_OnChange} $DestDriveTxt OnSelectDrive 
   
 ; All Drives Option
-  ;${NSD_CreateCheckBox} 30% 23 30% 15 "Show All Drives?" ; was 17% 23 41% 15
-  ;Pop $AllDriveOption
-  ;${NSD_OnClick} $AllDriveOption ListAllDrives   
+  ${NSD_CreateCheckBox} 30% 23 30% 15 "Show All Drives?" ; was 17% 23 41% 15
+  Pop $AllDriveOption
+  ${NSD_OnClick} $AllDriveOption ListAllDrives   
   
 ; Format Drive Option
   ${NSD_CreateCheckBox} 60% 23 100% 15 "Format $DestDisk Drive (Erase Content)?"
@@ -335,15 +335,15 @@ Function SelectionsPage
   ${NSD_SetText} $LabelDrivePage "Step 1: Select the Drive Letter of your USB Device."    
   
 ; Droplist for Drive Selection
-  ${NSD_CreateDropList} 0 20 40% 15 "" ; was 0 20 15% 15
+  ${NSD_CreateDropList} 0 20 28% 15 "" ; was 0 20 15% 15
   Pop $DestDriveTxt
   Call ListAllDrives
   ${NSD_OnChange} $DestDriveTxt OnSelectDrive
  
 ; All Drives Option
- ; ${NSD_CreateCheckBox} 30% 23 30% 15 "Show All Drives?" ; was 17% 23 41% 15
- ; Pop $AllDriveOption
- ; ${NSD_OnClick} $AllDriveOption ListAllDrives 
+ ${NSD_CreateCheckBox} 30% 23 30% 15 "Show All Drives?" ; was 17% 23 41% 15
+ Pop $AllDriveOption
+ ${NSD_OnClick} $AllDriveOption ListAllDrives 
   
 ; Format Drive Option
   ${NSD_CreateCheckBox} 60% 23 100% 15 "Format $DestDisk Drive (Erase Content)?"
@@ -456,19 +456,19 @@ Function Finish_PreFunction
 FunctionEnd
 
 Function ListAllDrives ; Set to Display All Drives
-  ;SendMessage $DestDriveTxt ${CB_RESETCONTENT} 0 0 
-  ;${NSD_GetState} $AllDriveOption $DisplayAll
-  ;${If} $DisplayAll == ${BST_CHECKED}
-  ;${NSD_Check} $AllDriveOption
-  ;${NSD_SetText} $AllDriveOption "Showing All Drives" 
-  ;  StrCpy $ShowAll "YES"
-  ;  ${GetDrives} "ALL" DrivesList ; All Drives Listed  
-  ;${ElseIf} $DisplayAll == ${BST_UNCHECKED}
-  ;${NSD_Uncheck} $AllDriveOption
-  ;${NSD_SetText} $AllDriveOption "Show All Drives?"  
-	${GetDrives} "FDD+HDD" DrivesList ; FDD+HDD reduced to FDD for removable media only
-	;StrCpy $ShowAll "NO"
-  ;${EndIf}
+  SendMessage $DestDriveTxt ${CB_RESETCONTENT} 0 0 
+  ${NSD_GetState} $AllDriveOption $DisplayAll
+  ${If} $DisplayAll == ${BST_CHECKED}
+  ${NSD_Check} $AllDriveOption
+  ${NSD_SetText} $AllDriveOption "Showing All Drives" 
+   StrCpy $ShowAll "YES"
+   ${GetDrives} "FDD+HDD" DrivesList ; All Drives Listed  
+  ${ElseIf} $DisplayAll == ${BST_UNCHECKED}
+  ${NSD_Uncheck} $AllDriveOption
+  ${NSD_SetText} $AllDriveOption "Show All Drives?"  
+	 ${GetDrives} "FDD" DrivesList ; FDD+HDD reduced to FDD for removable media only
+	StrCpy $ShowAll "NO"
+  ${EndIf}
 FunctionEnd
 
 Function onClickMyLink
@@ -876,9 +876,9 @@ Function DrivesList
 ;Prevent System Drive from being selected
  StrCpy $7 $WINDIR 3
  ${If} $9 != "$7" 
- SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $2 $8" 
+ SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity" 
+ ;SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity $2 $8" 
  ${EndIf}
- ; SendMessage $DestDriveTxt ${CB_ADDSTRING} 0 "STR:$9 $VolName $Capacity" 
  Push 1 ; must push something - see GetDrives documentation
 FunctionEnd
 
@@ -886,20 +886,21 @@ Function FormatYes ; If Format is checked, do something
   ${If} $FormatMe == "Yes"
  
 ; Close All Open Explorer Windows 
-  ;DetailPrint "Closing All Open Explorer Windows" 
-  ;FindWindow $R0 CabinetWClass
-  ;IsWindow $R0 0 +3
-  ;SendMessage $R0 ${WM_SYSCOMMAND} 0xF060 0
-  ;Goto -3
-  Call PhysDrive2 ; Lock and Unmount drive
-  Call PhysDrive3 ; Unlock drive
+  DetailPrint "Closing All Open Explorer Windows" 
+  FindWindow $R0 CabinetWClass
+  IsWindow $R0 0 +3
+  SendMessage $R0 ${WM_SYSCOMMAND} 0xF060 0
+  Goto -3
+  
+  ;Call PhysDrive2 ; Lock and Unmount drive
+  ;Call PhysDrive3 ; Unlock drive
   SetShellVarContext all
   InitPluginsDir
   File /oname=$PLUGINSDIR\fat32format.exe "fat32format.exe"  
   DetailPrint "Formatting $DestDisk as Fat32 using Fat32format.exe"
   nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format $DestDisk"' ;/Q /y
   ;nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format -c$BlockSize $DestDisk"' ;/Q /y
-  ${EndIf} 
+  ${EndIf}   
 FunctionEnd
 
 Function FormatIt ; Set Format Option

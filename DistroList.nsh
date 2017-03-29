@@ -135,6 +135,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "SLAX (Tiny Slackware Based Distro)" "slax*.iso" "http://www.slax.org/download.php" "NULL" "linux.cfg" "http://slax.org" "SLAX"
  !insertmacro SetISOFileNames "Slitaz (Another Tiny Distro)" "slitaz*.iso" "http://distro.ibiblio.org/slitaz/iso/5.0/" "NULL" "linux.cfg" "http://www.slitaz.org" "SliTaZ"
  !insertmacro SetISOFileNames "Skywave" "skywave*.iso" "https://sourceforge.net/projects/skywavelinux/files/latest/download" "casper" "linux.cfg" "http://skywavelinux.com/" "Skywave Linux" 
+ !insertmacro SetISOFileNames "Solus" "solus*.iso" "https://solus-project.com/download/" "NULL" "linux.cfg" "https://solus-project.com/" "Solus" 
  !insertmacro SetISOFileNames "SolydX" "solydx*.iso" "http://solydxk.com/downloads/solydx/" "NULL" "linux.cfg" "http://solydxk.com" "SolydX Linux" 
  !insertmacro SetISOFileNames "Sparky Linux" "sparkylinux*.iso" "http://sourceforge.net/projects/sparkylinux/files/latest/download" "NULL" "linux.cfg" "http://sparkylinux.org" "Sparky Linux" 
  !insertmacro SetISOFileNames "Subgraph OS" "subgraph*.iso" "https://subgraph.com/sgos/download/index.en.html" "NULL" "linux.cfg" "https://subgraph.com" "Subgraph OS"

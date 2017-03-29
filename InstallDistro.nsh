@@ -653,6 +653,12 @@ FunctionEnd
    !insertmacro ReplaceInFile "INITRD /boot" "INITRD /multiboot/$JustISOName/boot" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
    !insertmacro ReplaceInFile "APPEND boot=live" "APPEND live-media-path=/multiboot/$JustISOName/live boot=live" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"
    ${EndIf} 
+   
+; Solus
+   ${If} $DistroName == "Solus"
+   !insertmacro ReplaceInFile "kernel /boot" "kernel /multiboot/$JustISOName/boot" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+   !insertmacro ReplaceInFile "initrd=/boot" "initrd=/multiboot/$JustISOName/boot" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
+   ${EndIf}    
 
 ; Liberte
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\liberte\boot\syslinux\syslinux.cfg"  

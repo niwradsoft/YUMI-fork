@@ -43,17 +43,17 @@ Function PhysDrive
  Call HDDNumber      
 FunctionEnd
 
-Function PhysDrive2
- StrCpy $1 "$JustDrive"
- Push $1
- Call Dismount_Volume    
-FunctionEnd
+; Function PhysDrive2
+ ; StrCpy $1 "$JustDrive"
+ ; Push $1
+ ; Call Dismount_Volume    
+; FunctionEnd
 
-Function PhysDrive3
- StrCpy $1 "$JustDrive"
- Push $1
- Call Unlock_Volume    
-FunctionEnd
+; Function PhysDrive3
+ ; StrCpy $1 "$JustDrive"
+ ; Push $1
+ ; Call Unlock_Volume    
+; FunctionEnd
 
 ; WriteToFile Function originally written by Afrow UK http://nsis.sourceforge.net/Simple_write_text_to_file, modified by Lance http://www.pendrivelinux.com to populate .cfg file with what the user chose!
 Function Write2mbrid
@@ -156,118 +156,118 @@ Function HDDNumber
   Pop $1
 FunctionEnd
 
-; Lock and Dismount to allow I/O Access
-Function Dismount_Volume
-  ; Save registers
-  Exch $1
-  Push $2
-  Push $3
-  Push $4
-  Push $5   
+; ; Lock and Dismount to allow I/O Access
+; Function Dismount_Volume
+  ; ; Save registers
+  ; Exch $1
+  ; Push $2
+  ; Push $3
+  ; Push $4
+  ; Push $5   
 
-  ; Get volume name associated with drive letter
-  System::Call "kernel32::GetVolumeNameForVolumeMountPoint(t r1, t r3r3, i ${MAXLEN_VOLUME_GUID}) i.r2"
-  ${If} $2 != 0
-     ; Get handle of volume
-     StrCpy $3 $3 -1
-	 StrCpy $VolMountPoint $3
-	; MessageBox MB_ICONSTOP|MB_OK "Volume $VolMountPoint"
-     System::Call "kernel32::CreateFile(t r3, \\
-       i ${GENERIC_READ}|${GENERIC_WRITE}, \\
-       i ${FILE_SHARE_READ}|${FILE_SHARE_WRITE}, \\
-       i 0, i ${OPEN_EXISTING}, i 0, i 0) i.r2" 
-	   ;MessageBox MB_ICONSTOP|MB_OK "$2 = ${INVALID_HANDLE_VALUE} test_dismount"
-    ${If} $2 != ${INVALID_HANDLE_VALUE}		 
-	    ; Send FSCTL_LOCK_VOLUME command		   
-        System::Call "kernel32::DeviceIoControl(i r2, \\
-            i ${FSCTL_LOCK_VOLUME}, \\
-            i 0, i 0, \\
-            i 0, i ${EXTENTS_BUFFER_SIZE}, \\
-            i 0, i 0) i.r3"	
-	    DetailPrint "Volume Locked"
-    ${Else}			
-	    DetailPrint "Error Opening Volume"
-	    ; Send FSCTL_UNLOCK_VOLUME command		   
-        System::Call "kernel32::DeviceIoControl(i r2, \\
-            i ${FSCTL_UNLOCK_VOLUME}, \\
-            i 0, i 0, \\
-            i 0, i ${EXTENTS_BUFFER_SIZE}, \\
-            i 0, i 0) i.r3"			
+  ; ; Get volume name associated with drive letter
+  ; System::Call "kernel32::GetVolumeNameForVolumeMountPoint(t r1, t r3r3, i ${MAXLEN_VOLUME_GUID}) i.r2"
+  ; ${If} $2 != 0
+     ; ; Get handle of volume
+     ; StrCpy $3 $3 -1
+	 ; StrCpy $VolMountPoint $3
+	; ; MessageBox MB_ICONSTOP|MB_OK "Volume $VolMountPoint"
+     ; System::Call "kernel32::CreateFile(t r3, \\
+       ; i ${GENERIC_READ}|${GENERIC_WRITE}, \\
+       ; i ${FILE_SHARE_READ}|${FILE_SHARE_WRITE}, \\
+       ; i 0, i ${OPEN_EXISTING}, i 0, i 0) i.r2" 
+	   ; ;MessageBox MB_ICONSTOP|MB_OK "$2 = ${INVALID_HANDLE_VALUE} test_dismount"
+    ; ${If} $2 != ${INVALID_HANDLE_VALUE}		 
+	    ; ; Send FSCTL_LOCK_VOLUME command		   
+        ; System::Call "kernel32::DeviceIoControl(i r2, \\
+            ; i ${FSCTL_LOCK_VOLUME}, \\
+            ; i 0, i 0, \\
+            ; i 0, i ${EXTENTS_BUFFER_SIZE}, \\
+            ; i 0, i 0) i.r3"	
+	    ; DetailPrint "Volume Locked"
+    ; ${Else}			
+	    ; DetailPrint "Error Opening Volume"
+	    ; ; Send FSCTL_UNLOCK_VOLUME command		   
+        ; System::Call "kernel32::DeviceIoControl(i r2, \\
+            ; i ${FSCTL_UNLOCK_VOLUME}, \\
+            ; i 0, i 0, \\
+            ; i 0, i ${EXTENTS_BUFFER_SIZE}, \\
+            ; i 0, i 0) i.r3"			
 		
-		System::Call "kernel32::CloseHandle(i r2) i.r3" 
-	${EndIf}	
+		; System::Call "kernel32::CloseHandle(i r2) i.r3" 
+	; ${EndIf}	
 		
-	; Send FSCTL_DISMOUNT_VOLUME command		   
-        System::Call "kernel32::DeviceIoControl(i r2, \\
-            i ${FSCTL_DISMOUNT_VOLUME}, \\
-            i 0, i 0, \\
-            i 0, i ${EXTENTS_BUFFER_SIZE}, \\
-            i 0, i 0) i.r4"
+	; ; Send FSCTL_DISMOUNT_VOLUME command		   
+        ; System::Call "kernel32::DeviceIoControl(i r2, \\
+            ; i ${FSCTL_DISMOUNT_VOLUME}, \\
+            ; i 0, i 0, \\
+            ; i 0, i ${EXTENTS_BUFFER_SIZE}, \\
+            ; i 0, i 0) i.r4"
 			
-    ${If} $4 == 0					
-	    DetailPrint "Error Opening $4"
-		System::Call "kernel32::CloseHandle(i r2) i.r5" 
-		;Sleep 1000
-    ${Else}	
-		DetailPrint "Volume Dismounted"
-		System::Call "kernel32::CloseHandle(i r2) i.r5"
-	${EndIf}
-  ${EndIf}
-  ; Restore registers
-  Pop $5  
-  Pop $4
-  Pop $3
-  Pop $2
-  Pop $1
-FunctionEnd 
+    ; ${If} $4 == 0					
+	    ; DetailPrint "Error Opening $4"
+		; System::Call "kernel32::CloseHandle(i r2) i.r5" 
+		; ;Sleep 1000
+    ; ${Else}	
+		; DetailPrint "Volume Dismounted"
+		; System::Call "kernel32::CloseHandle(i r2) i.r5"
+	; ${EndIf}
+  ; ${EndIf}
+  ; ; Restore registers
+  ; Pop $5  
+  ; Pop $4
+  ; Pop $3
+  ; Pop $2
+  ; Pop $1
+; FunctionEnd 
 
-; UnLock volume to allow system to detect it
-Function Unlock_Volume
-  ; Save registers
-  Exch $1
-  Push $2
-  Push $3
-  Push $4
+; ; UnLock volume to allow system to detect it
+; Function Unlock_Volume
+  ; ; Save registers
+  ; Exch $1
+  ; Push $2
+  ; Push $3
+  ; Push $4
 
-  ; Get volume name associated with drive letter
-  System::Call "kernel32::GetVolumeNameForVolumeMountPoint(t r1, t r3r3, i ${MAXLEN_VOLUME_GUID}) i.r2"
-  ${If} $2 != 0
-     ; Get handle of volume
-     StrCpy $3 $3 -1
-	 StrCpy $VolMountPoint $3
-	 ;MessageBox MB_ICONSTOP|MB_OK "Volume $VolMountPoint"
-	 ;MessageBox MB_ICONSTOP|MB_OK "$2 test"
-     System::Call "kernel32::CreateFile(t r3, \\
-       i ${GENERIC_READ}|${GENERIC_WRITE}, \\
-       i ${FILE_SHARE_READ}|${FILE_SHARE_WRITE}, \\
-       i 0, i ${OPEN_EXISTING}, i 0, i 0) i.r2" 
+  ; ; Get volume name associated with drive letter
+  ; System::Call "kernel32::GetVolumeNameForVolumeMountPoint(t r1, t r3r3, i ${MAXLEN_VOLUME_GUID}) i.r2"
+  ; ${If} $2 != 0
+     ; ; Get handle of volume
+     ; StrCpy $3 $3 -1
+	 ; StrCpy $VolMountPoint $3
+	 ; ;MessageBox MB_ICONSTOP|MB_OK "Volume $VolMountPoint"
+	 ; ;MessageBox MB_ICONSTOP|MB_OK "$2 test"
+     ; System::Call "kernel32::CreateFile(t r3, \\
+       ; i ${GENERIC_READ}|${GENERIC_WRITE}, \\
+       ; i ${FILE_SHARE_READ}|${FILE_SHARE_WRITE}, \\
+       ; i 0, i ${OPEN_EXISTING}, i 0, i 0) i.r2" 
 	   
-    ${If} $2 != ${INVALID_HANDLE_VALUE}		 
-	 ;MessageBox MB_ICONSTOP|MB_OK "$2 = ${INVALID_HANDLE_VALUE} test_Unlock_Volume"
-	    DetailPrint "Unlocking Volume to allow access to it"
-	    ; Send FSCTL_UNLOCK_VOLUME command		   
-        System::Call "kernel32::DeviceIoControl(i r2, \\
-            i ${FSCTL_UNLOCK_VOLUME}, \\
-            i 0, i 0, \\
-            i 0, i ${EXTENTS_BUFFER_SIZE}, \\
-            i 0, i 0) i.r3"			
-	;---	
-	  ${If} $3 == 0					
-	    DetailPrint "Volume Unlocked"
-      ${Else}	
-		DetailPrint "Error Unlocking Volume"
-	  ${EndIf}
-	;---	
-		System::Call "kernel32::CloseHandle(i r2) i.r4" 
-	${Else}
-	 ;MessageBox MB_ICONSTOP|MB_OK "$2 test2"
-	  DetailPrint "Error Getting Volume Name associated with drive letter"
-	${EndIf}	
+    ; ${If} $2 != ${INVALID_HANDLE_VALUE}		 
+	 ; ;MessageBox MB_ICONSTOP|MB_OK "$2 = ${INVALID_HANDLE_VALUE} test_Unlock_Volume"
+	    ; DetailPrint "Unlocking Volume to allow access to it"
+	    ; ; Send FSCTL_UNLOCK_VOLUME command		   
+        ; System::Call "kernel32::DeviceIoControl(i r2, \\
+            ; i ${FSCTL_UNLOCK_VOLUME}, \\
+            ; i 0, i 0, \\
+            ; i 0, i ${EXTENTS_BUFFER_SIZE}, \\
+            ; i 0, i 0) i.r3"			
+	; ;---	
+	  ; ${If} $3 == 0					
+	    ; DetailPrint "Volume Unlocked"
+      ; ${Else}	
+		; DetailPrint "Error Unlocking Volume"
+	  ; ${EndIf}
+	; ;---	
+		; System::Call "kernel32::CloseHandle(i r2) i.r4" 
+	; ${Else}
+	 ; ;MessageBox MB_ICONSTOP|MB_OK "$2 test2"
+	  ; DetailPrint "Error Getting Volume Name associated with drive letter"
+	; ${EndIf}	
 	
-  ${EndIf}
-  ; Restore registers
-  Pop $4
-  Pop $3
-  Pop $2
-  Pop $1
-FunctionEnd 
+  ; ${EndIf}
+  ; ; Restore registers
+  ; Pop $4
+  ; Pop $3
+  ; Pop $2
+  ; Pop $1
+; FunctionEnd 
