@@ -364,6 +364,18 @@ FunctionEnd
   !insertmacro ReplaceInFile "kernel /casper/" "kernel /multiboot/$JustISOName/casper/" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"  
   ${EndIf}
   
+; For ChaletOS
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\chaletos32bit\*.*" 
+  !insertmacro ReplaceInFile "file=/cdrom" "file=/multiboot/$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"  
+  !insertmacro ReplaceInFile "initrd=/chaletos" "cdrom-detect/try-usb=true noprompt floppy.allowed_drive_mask=0 ignore_uuid initrd=/multiboot/$JustISOName/chaletos" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"  
+  !insertmacro ReplaceInFile "kernel /chaletos" "kernel /multiboot/$JustISOName/chaletos" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   
+  !insertmacro ReplaceInFile "live-media-path=chaletos" "live-media-path=/multiboot/$JustISOName/chaletos" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   
+  !insertmacro ReplaceInFile "file=/cdrom" "file=/multiboot/$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\bootproblemmenu.cfg"  
+  !insertmacro ReplaceInFile "initrd=/chaletos" "cdrom-detect/try-usb=true noprompt floppy.allowed_drive_mask=0 ignore_uuid initrd=/multiboot/$JustISOName/chaletos" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\bootproblemmenu.cfg"  
+  !insertmacro ReplaceInFile "kernel /chaletos" "kernel /multiboot/$JustISOName/chaletos" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\bootproblemmenu.cfg"   
+  !insertmacro ReplaceInFile "live-media-path=chaletos" "live-media-path=/multiboot/$JustISOName/chaletos" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\bootproblemmenu.cfg"   
+  ${EndIf}  
+  
 ; Alt For derivatives like Dr.Web Livedisk
   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\syslinux\txt.cfg" ; Rename the following for syslinux txt.cfg
   !insertmacro ReplaceInFile "file=/cdrom/preseed/" "file=/cdrom/multiboot/$JustISOName/preseed/" "all" "all" "$BootDir\multiboot\$JustISOName\syslinux\txt.cfg"  
@@ -410,6 +422,7 @@ FunctionEnd
   ${OrIf} $DistroName == "Boot Repair Disk 32bit"  
   ${OrIf} $DistroName == "Boot Repair Disk 64bit" 
   ${OrIf} $DistroName == "Elementary OS"   
+  ${OrIf} $DistroName == "Zorin OS Core"   
 ; Disable Ubuntu modified gfxboot as the Ubuntu bootlogo archive does not currently contain all necessary files for newer syslinux 6+.
     ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg" ; Rename the following for isolinux.cfg  
     !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   
@@ -721,7 +734,7 @@ FunctionEnd
    !insertmacro ReplaceInFile "archisolabel=ARCH" "archisolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\syslinux.cfg"     
    ${EndIf}     
 
-; Manjaro
+; Manjaro/Netrunner
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\.miso"  
    !insertmacro ReplaceInFile "kernel /manjaro" "kernel /multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    !insertmacro ReplaceInFile "append initrd=/manjaro" "append initrd=/multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
@@ -729,6 +742,12 @@ FunctionEnd
    !insertmacro ReplaceInFile ",/manjaro" ",/multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    !insertmacro ReplaceInFile "misolabel=MJRO" "misolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"
    CopyFiles "$BootDir\multiboot\$JustISOName\.miso" "$BootDir"
+   ${AndIf} $DistroName == "Netrunner" 
+   !insertmacro ReplaceInFile "kernel /netrunner" "kernel /multiboot/$JustISOName/netrunner" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+   !insertmacro ReplaceInFile "append initrd=/netrunner" "append initrd=/multiboot/$JustISOName/netrunner" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
+   !insertmacro ReplaceInFile "misobasedir=netrunner" "misobasedir=/multiboot/$JustISOName/netrunner" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"    
+   !insertmacro ReplaceInFile ",/netrunner" ",/multiboot/$JustISOName/netrunner" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+   !insertmacro ReplaceInFile "misolabel=NR" "misolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"
    ${EndIf}     
 
 ; Slax
@@ -903,6 +922,10 @@ FunctionEnd
    ${EndIf}  
    
 ; Trinity Rescue Kit
+  ${If} $DistroName == "Trinity Rescue Kit" 
+  CreateDirectory "$BootDir\trk3\" ; Create trk3 directory
+  ${EndIf} 
+  
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\trk3\trkramfs" 
    CopyFiles "$BootDir\multiboot\$JustISOName\trk3\*.*" "$BootDir\trk3\" 
    RMDir /R "$BootDir\multiboot\$JustISOName\trk3" 
