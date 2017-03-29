@@ -226,7 +226,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Kon-Boot Purchased" "kon-boot*.exe" "NONE" "NULL" "other.cfg" "http://www.piotrbania.com/all/kon-boot/" "Kon-Boot" 
  
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
-     !insertmacro SetISOFileNames "--- Windows PE and Installers ---" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "--- Windows Installers ---" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
 	 
  ;!insertmacro SetISOFileNames "Windows 10 Installer" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
@@ -235,9 +235,14 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Multiple Windows Vista/7/8/10 Installers -bootmgr" "*.iso" "NONE" "NULL" "win.lst" "" ""   
  ;!insertmacro SetISOFileNames "Single Windows Vista/7/8/10 Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""  
  !insertmacro SetISOFileNames "Single Windows XP Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""   
- ; !insertmacro SetISOFileNames "Single Windows PE" "*.iso" "NONE" "NULL" "pe.lst" "" ""   
+ 
+     !insertmacro SetISOFileNames "" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "--- Windows PE Builds ---" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "" "" "" "" "" "" "" 
+ 
+ !insertmacro SetISOFileNames "Single Windows PE" "*.iso" "NONE" "NULL" "pe.lst" "" ""   
  !insertmacro SetISOFileNames "Multiple Windows PE -bootmgr" "*.iso" "NONE" "NULL" "pe.lst" "" ""  
- ;REVISIT !insertmacro SetISOFileNames "Multiple Windows PE -wimboot" "*.iso" "NONE" "NULL" "win.lst" "" ""   
+ ;REVISIT !insertmacro SetISOFileNames "Multiple Windows PE -wimboot" "*.iso" "NONE" "NULL" "pe.lst" "" ""   
  
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "--- Try an Unlisted ISO ---" "" "" "" "" "" ""

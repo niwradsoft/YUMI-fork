@@ -358,7 +358,8 @@ FunctionEnd
  
 ; Windows PE - bootmgr at root of USB
  ${ElseIf} $DistroName == "Multiple Windows PE -bootmgr"
- ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]*'    
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]* -x!Programs'   
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -ir!Programs -o"$BootDir\"'   
  
   ${IfNot} ${FileExists} "$BootDir\multiboot\$JustISOName\efi\microsoft\boot\bcd"
    ${WriteToFile} "#start $JustISOName$\r$\ntitle $JustISOName - bootmgr at root$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  

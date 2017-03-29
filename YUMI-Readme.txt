@@ -28,6 +28,7 @@ Additional information for YUMI can be found HERE: https://www.pendrivelinux.com
 
 Changelog:
 
+01/30/17 Version 2.0.3.8: Quick Fix for singular and multiple Win PE builds. 
 01/28/17 Version 2.0.3.7: Update to support various Win PE builds. Modified distribution removal process. Corrected font size for Show All ISOs option.
 01/14/17 Version 2.0.3.6: Update to support multiple Windows Vista/7/8/10 Installers. -wimboot option stores the extracted Windows Installers in their own directory. -bootmgr option moves only bootmgr and bcd to root of drive. (note: -bootmgr option does require a Windows Vista or later host to run bcdedit).
 12/27/16 Version 2.0.3.5: Fix to replace empty spaces in Distro filename with dashes. Add Windows PE (WIM) boot options (unfinished). Implement wimboot capabilities, Switch to newer Grub4Dos. Update labels.
