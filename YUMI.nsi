@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.5"
+!define VERSION "2.0.4.6"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -858,6 +858,7 @@ Function InstallorRemove ; Populate DistroName based on Install/Removal option
     ${If} $DistroName == ""
     ${NSD_SetText} $LinuxDistroSelection "Step 2: Select a Distribution to put on $DestDisk" 
 	${EndIf}
+  SendMessage $Distro ${CB_RESETCONTENT} 0 0
   Call SetISOFileName
   ${EndIf}
 FunctionEnd  
