@@ -85,7 +85,8 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "--- Other Distros 32/64 Bit ---" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""	 
-	 
+
+ !insertmacro SetISOFileNames "Android x86" "android-x86*.iso" "http://www.fosshub.com/Android-x86.html" "NULL" "linux.cfg" "http://www.android-x86.org/" "Android-x86"   	 
  !insertmacro SetISOFileNames "AntiX" "antiX*.iso" "http://sourceforge.net/projects/antix-linux/files/Final/antiX-13.1/antiX-13.1_386-full.iso/download" "NULL" "linux.cfg" "http://sourceforge.net/projects/antix-linux/" "AntiX"   
  !insertmacro SetISOFileNames "Archlinux" "archlinux*dual.iso" "http://mirrors.us.kernel.org/archlinux/iso/latest/" "NULL" "linux.cfg" "http://www.archlinux.org" "Archlinux"  
  !insertmacro SetISOFileNames "Bodhi" "bodhi*.iso" "http://sourceforge.net/projects/bodhilinux/files/latest/download" "NULL" "linux.cfg" "http://www.bodhilinux.com" "Bodhi"  

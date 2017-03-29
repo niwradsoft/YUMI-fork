@@ -27,8 +27,10 @@ GRUB4DOS © the Gna! people + Chenall https://code.google.com/p/grub4dos-chenall/
 7-Zip is © Igor Pavlovis www.7-zip.org  
 Fat32format.exe © Tom Thornhill Ridgecorp Consultants http://www.ridgecrop.demon.co.uk
 Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/
+dd.exe © John Newbigin http://www.chrysocome.net/
+mke2fs © Matt <mattwu@163.com> http://www.ext2fsd.com
 
-YUMI, Grub, Fat32format, Syslinux covered under GNU GPL version 2
+YUMI, Grub, Fat32format, dd, mke2fs, and Syslinux covered under GNU GPL version 2
 7-zip is covered under an LGPL + AES License - see the License following GNU GPL 2
 Firadisk is covered under GNU GPL version 3
 

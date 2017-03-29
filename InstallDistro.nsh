@@ -380,13 +380,15 @@ FunctionEnd
   ${EndIf}
 
 ; Disable Ubuntu modified gfxboot as older Ubuntu bootlogo archives might not contain all necessary files for newer syslinux 6+.
-   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg" ; Rename the following for isolinux.cfg 
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg" ; Rename the following for isolinux.cfg  
    	 ${StrContains} $0 "buntu-17" "$JustISO"   
 	 ${StrContains} $1 "buntu-16" "$JustISO"
      ${StrContains} $2 "buntu-15" "$JustISO" 
+     ${StrContains} $3 "buntu" "$JustISO" 	 
      ${If} $0 != "buntu-17" 
      ${AndIf} $1 != "buntu-16"  
 	 ${AndIf} $2 != "buntu-15"  
+	 ${AndIf} $3 == "buntu" 	 
      !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   
      ${EndIf}
    ${EndIf}  
@@ -394,9 +396,11 @@ FunctionEnd
    	 ${StrContains} $0 "buntu-17" "$JustISO"   
 	 ${StrContains} $1 "buntu-16" "$JustISO"
      ${StrContains} $2 "buntu-15" "$JustISO" 
+     ${StrContains} $3 "buntu" "$JustISO" 		 
      ${If} $0 != "buntu-17" 
      ${AndIf} $1 != "buntu-16"  
-	 ${AndIf} $2 != "buntu-15"  
+	 ${AndIf} $2 != "buntu-15" 
+	 ${AndIf} $3 == "buntu" 	 
      !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\syslinux\syslinux.cfg"      
      ${EndIf}
    ${EndIf}
@@ -703,6 +707,7 @@ FunctionEnd
    !insertmacro ReplaceInFile "kernel /manjaro" "kernel /multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    !insertmacro ReplaceInFile "append initrd=/manjaro" "append initrd=/multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
    !insertmacro ReplaceInFile "misobasedir=manjaro" "misobasedir=/multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"    
+   !insertmacro ReplaceInFile ",/manjaro" ",/multiboot/$JustISOName/manjaro" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    !insertmacro ReplaceInFile "misolabel=MJRO" "misolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"
    CopyFiles "$BootDir\multiboot\$JustISOName\.miso" "$BootDir"
    ${EndIf}     
@@ -862,6 +867,12 @@ FunctionEnd
    !insertmacro ReplaceInFile "initrd=/boot" "initrd=/multiboot/$JustISOName/boot" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\jp.cfg" 
    !insertmacro ReplaceInFile "KERNEL /boot" "KERNEL /multiboot/$JustISOName/boot" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\jp.cfg"    
    ${EndIf}  
+
+; Android-x86   
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\android-x86.png" 
+  !insertmacro ReplaceInFile "kernel /kernel" "kernel /multiboot/$JustISOName/kernel" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+  !insertmacro ReplaceInFile "initrd=/initrd.img" "initrd=/multiboot/$JustISOName/initrd.img" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
+  ${EndIf}   
 
 ; RIP Linux
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\BOOT\DOC\RIPLINUX.TXT" 

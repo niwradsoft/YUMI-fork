@@ -35,6 +35,20 @@ Binary: http://www.ridgecrop.demon.co.uk/download/fat32format.zip
 Source: http://www.ridgecrop.demon.co.uk/download/fat32formatsrc.zip
 
 
+dd.exe (dd for Windows)
+
+Homepage: http://www.chrysocome.net/dd
+Binary: http://www.chrysocome.net/downloads/dd-0.6beta3.zip
+Source: http://www.chrysocome.net/downloads/dd-0.6beta3.src.zip
+
+
+mke2fs.exe (Mke2fs for Winnt/2k/xp)
+
+Authors Homepage: http://www.ext2fsd.com/ 
+Project: https://sourceforge.net/projects/ext2fsd/ (part of the Ext2Fsd Project)
+Binary/Source: https://sourceforge.net/projects/ext2fsd/files/Mke2fs/0.02/mke2fs-0.02.zip/download
+
+
 Firadisk.img (File/Ram Disk Driver)
 
 Homepage: http://reboot.pro/8804/
