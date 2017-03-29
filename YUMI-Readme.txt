@@ -25,6 +25,7 @@ Credits, Resources, and Third Party Tools used:
 Additional information for YUMI can be found HERE: http://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 Changelog:
+09/14/16 Version 2.0.2.8: Fix menu entries for boot repair, and elementary OS. Upgrade to 7-Zip 16.02.
 08/17/16 Version 2.0.2.7: Add support for Arch Bang, Skywave Linux, and Cyborg Linux.
 07/07/16 Version 2.0.2.6: Add support for Android-x86. Fix broken Manjaro entry. Update credits and sources.
 07/01/16 Version 2.0.2.5: Fix Eset, avira, and Dr.Web menu entries which became broken in build 2.0.2.4. 

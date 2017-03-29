@@ -384,7 +384,7 @@ FunctionEnd
    	 ${StrContains} $0 "buntu-17" "$JustISO"   
 	 ${StrContains} $1 "buntu-16" "$JustISO"
      ${StrContains} $2 "buntu-15" "$JustISO" 
-     ${StrContains} $3 "buntu" "$JustISO" 	 
+     ${StrContains} $3 "buntu" "$JustISO" 		 
      ${If} $0 != "buntu-17" 
      ${AndIf} $1 != "buntu-16"  
 	 ${AndIf} $2 != "buntu-15"  
@@ -407,6 +407,9 @@ FunctionEnd
 ; Various Antivius (New Method) 
   ${If} $DistroName == "ESET SysRescue Live"
   ${OrIf} $DistroName == "Dr.Web LiveDisk" 
+  ${OrIf} $DistroName == "Boot Repair Disk 32bit"  
+  ${OrIf} $DistroName == "Boot Repair Disk 64bit" 
+  ${OrIf} $DistroName == "Elementary OS"   
 ; Disable Ubuntu modified gfxboot as the Ubuntu bootlogo archive does not currently contain all necessary files for newer syslinux 6+.
     ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg" ; Rename the following for isolinux.cfg  
     !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   

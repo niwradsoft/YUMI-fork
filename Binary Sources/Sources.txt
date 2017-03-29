@@ -24,8 +24,8 @@ Binary/Source: https://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-6.0
 7zG.exe, 7z.dll (7zip)
 
 Homepage: http://www.7-zip.org
-Binary: http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.exe
-Source: http://downloads.sourceforge.net/project/sevenzip/7-Zip/9.20/7z920.tar.bz2
+Binary: https://sourceforge.net/projects/sevenzip/files/7-Zip/16.02/7z1602.exe
+Source: https://sourceforge.net/projects/sevenzip/files/7-Zip/16.02/7z1602-src.7z
 
 
 Fat32format.exe (Fat32format)
