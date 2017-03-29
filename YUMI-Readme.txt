@@ -2,7 +2,7 @@ YUMI ©2011-2017 Lance https://www.pendrivelinux.com (covered under GNU GPL Licen
 
 Background of YUMI (Your Universal Multiboot Integrator):
 
-YUMI is an easy to use tool created using NSIS. YUMI's purpose is to help automate the creation of a bootable USB Flash Drive that can be used to boot multiple Linux based distributions (one at a time).
+YUMI is an easy to use tool created using NSIS. The purpose of YUMI is to help automate the creation of a bootable USB Flash Drive that can be used to boot multiple Linux based distributions (one at a time).
 The end result should be a bootable USB Flash drive that will get you up and running with your chosen Live Distributions, all without having to do the research and perform the steps by hand. 
 
 How YUMI Works:
@@ -28,7 +28,8 @@ Additional information for YUMI can be found HERE: https://www.pendrivelinux.com
 
 Changelog:
 
-01/30/17 Version 2.0.3.8: Quick Fix for singular and multiple Win PE builds. 
+02/02/17 Version 2.0.3.9: Update to support OSFClone, newer WifiSlax, and NetRunner. Correct AntiX entry to use bdir=. Update to replace empty spaces in iso file with dashes. Correction to GRUB Partition 4 option.
+01/30/17 Version 2.0.3.8: Quick fix for singular and multiple Win PE builds. 
 01/28/17 Version 2.0.3.7: Update to support various Win PE builds. Modified distribution removal process. Corrected font size for Show All ISOs option.
 01/14/17 Version 2.0.3.6: Update to support multiple Windows Vista/7/8/10 Installers. -wimboot option stores the extracted Windows Installers in their own directory. -bootmgr option moves only bootmgr and bcd to root of drive. (note: -bootmgr option does require a Windows Vista or later host to run bcdedit).
 12/27/16 Version 2.0.3.5: Fix to replace empty spaces in Distro filename with dashes. Add Windows PE (WIM) boot options (unfinished). Implement wimboot capabilities, Switch to newer Grub4Dos. Update labels.

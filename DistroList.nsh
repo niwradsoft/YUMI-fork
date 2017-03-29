@@ -88,7 +88,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""	 
 
  !insertmacro SetISOFileNames "Android x86" "android-x86*.iso" "https://www.fosshub.com/Android-x86.html" "NULL" "linux.cfg" "http://www.android-x86.org/" "Android-x86"   	 
- !insertmacro SetISOFileNames "AntiX" "antiX*.iso" "https://sourceforge.net/projects/antix-linux/files/Final/antiX-13.1/antiX-13.1_386-full.iso/download" "NULL" "linux.cfg" "http://sourceforge.net/projects/antix-linux/" "AntiX"   
+ !insertmacro SetISOFileNames "AntiX" "antiX*.iso" "https://sourceforge.net/projects/antix-linux/files/Final/antiX-16/antiX-16.1_386-full.iso/download" "NULL" "linux.cfg" "http://sourceforge.net/projects/antix-linux/" "AntiX"   
  !insertmacro SetISOFileNames "Archbang" "archbang*.iso" "https://sourceforge.net/projects/archbang/files/ArchBang-OpenRC/archbang-openrc-rc-100816-x86_64.iso/download" "NULL" "linux.cfg" "https://sourceforge.net/projects/archbang/" "Archbang"   
  !insertmacro SetISOFileNames "Archlinux" "archlinux*dual.iso" "http://mirrors.us.kernel.org/archlinux/iso/latest/" "NULL" "linux.cfg" "http://www.archlinux.org" "Archlinux"  
  !insertmacro SetISOFileNames "Bodhi" "bodhi*.iso" "https://sourceforge.net/projects/bodhilinux/files/latest/download" "NULL" "linux.cfg" "http://www.bodhilinux.com" "Bodhi"  
@@ -202,8 +202,9 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Ophcrack (no tables)" "ophcrack-notables-livecd-3.6.0.iso" "http://sourceforge.net/projects/ophcrack/files/ophcrack-livecd/3.6.0/ophcrack-notables-livecd-3.6.0.iso/download" "NULL" "system.cfg" "http://ophcrack.sourceforge.net" "Ophcrack"
  !insertmacro SetISOFileNames "Ophcrack XP (Password Finder)" "ophcrack-xp-livecd-3.6.0.iso" "http://downloads.sourceforge.net/ophcrack/ophcrack-xp-livecd-3.6.0.iso" "NULL" "system.cfg" "http://ophcrack.sourceforge.net" "Ophcrack"
  !insertmacro SetISOFileNames "Ophcrack Vista/7 (Password Finder)" "ophcrack-vista-livecd-3.6.0.iso" "http://downloads.sourceforge.net/ophcrack/ophcrack-vista-livecd-3.6.0.iso" "NULL" "system.cfg" "http://ophcrack.sourceforge.net" "Ophcrack"
+ !insertmacro SetISOFileNames "OSFClone (Disk Cloning Tool)" "osfclone.iso" "http://www.osforensics.com/downloads/osfclone.iso" "NULL" "system.cfg" "http://www.osforensics.com/tools/create-disk-images.html" "OSFClone"
  !insertmacro SetISOFileNames "Parted Magic (Partition Tools)" "pmagic*.iso" "NONE" "NULL" "system.cfg" "http://partedmagic.com" "Parted Magic"
- !insertmacro SetISOFileNames "Partition Wizard (Partition Tools)" "pwfree*.iso" "http://www.minitool.com/C3883AF0-D8F8-4CAB-83D8-DA6497F1C8CC/pwfree9.iso" "NULL" "system.cfg" "http://www.partitionwizard.com" "Partition Wizard"
+ !insertmacro SetISOFileNames "Partition Wizard (Partition Tools)" "pwfree*.iso" "http://www.partitionwizard.com/download/pwfree91-x86.iso" "NULL" "system.cfg" "http://www.partitionwizard.com" "Partition Wizard"
  !insertmacro SetISOFileNames "PING (Partimg Is Not Ghost)" "PING*.iso" "http://ping.windowsdream.com/ping/Releases/3.02/PING-3.02.iso" "NULL" "system.cfg" "http://ping.windowsdream.com" "PING"
  !insertmacro SetISOFileNames "Rescatux" "rescatux*.iso" "http://www.supergrubdisk.org/category/download/rescatuxdownloads/rescatux-stable/" "NULL" "system.cfg" "http://www.supergrubdisk.org/rescatux/" "Rescatux" 
  !insertmacro SetISOFileNames "Redo Backup And Recovery (Recovery Tools)" "redobackup-livecd*.iso" "http://sourceforge.net/projects/redobackup/files/latest/download" "NULL" "system.cfg" "http://redobackup.org" "RedoBackup"
@@ -212,7 +213,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "System Rescue CD" "systemrescuecd*.iso" "http://sourceforge.net/projects/systemrescuecd/files/latest/download" "NULL" "system.cfg" "http://www.sysresccd.org" "System Rescue"
  !insertmacro SetISOFileNames "Trinity Rescue Kit" "trinity-rescue-kit*.iso" "ftp://ftp.osuosl.org/pub/trk/trinity-rescue-kit.3.4-build-372.iso" "NULL" "system.cfg" "http://trinityhome.org" "TRK"
  !insertmacro SetISOFileNames "Ultimate Boot CD (Diagnostics Tools)" "ubcd5*.iso" "http://ftp.cc.uoc.gr/mirrors/linux/ubcd/ubcd535.iso" "NULL" "system.cfg" "http://www.ultimatebootcd.com" "Ultimate Boot CD"
- !insertmacro SetISOFileNames "Wifislax (Wireless Penetration Testing)" "wifislax-4*.iso" "http://www.wifislax.com/category/download/nuevas-versiones/" "NULL" "system.cfg" "http://www.wifislax.com/" "Wifislax"
+ !insertmacro SetISOFileNames "Wifislax (Wireless Penetration Testing)" "wifislax*.iso" "http://www.wifislax.com/category/download/nuevas-versiones/" "NULL" "system.cfg" "http://www.wifislax.com/" "Wifislax"
 ;REVISIT filename contains spaces !insertmacro SetISOFileNames "XIAOPAN (Wireless Penetration Testing)" "XIAOPAN*.iso" "http://sourceforge.net/projects/xiaopanos/files/latest/download" "NULL" "system.cfg" "http://xiaopan.co/forums/" "XIAOPAN"
 
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
@@ -249,7 +250,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
      !insertmacro SetISOFileNames "" "" "" "" "" "" "" 	 
  
  !insertmacro SetISOFileNames "Try Unlisted ISO (via SYSLINUX)" "*.iso" "NONE" "NULL" "unlisted.cfg" "" "" 	 
- !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB Partition 4)" "*.iso" "NONE" "NULL" "grubpart4.lst" "" "" 
+ !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB Partition 4)" "*.iso" "NULL" "NULL" "grubpart4.lst" "" "" 
  !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB)" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
  !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB from RAM)" "*.iso" "NONE" "NULL" "grubram.lst" "" ""  
  

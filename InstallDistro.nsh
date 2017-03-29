@@ -186,11 +186,31 @@ FunctionEnd
  
  ${ElseIf} $DistroName == "Bitdefender Rescue CD"
  CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO" 
- ${WriteToFile} "#start $JustISOName$\r$\nlabel Bitdefender ($JustISOName)$\r$\nmenu label title Bitdefender ($JustISOName)$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/bitdefender.lst$\r$\n#end $JustISOName" $R0   
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel Bitdefender ($JustISOName)$\r$\nMENU LABEL Bitdefender ($JustISOName)$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/bitdefender.lst$\r$\n#end $JustISOName" $R0   
  File /oname=$PLUGINSDIR\bitdefender.lst "Menu\bitdefender.lst"  
  CopyFiles "$PLUGINSDIR\bitdefender.lst" "$BootDir\multiboot\menu\bitdefender.lst" 
  !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\menu\bitdefender.lst" 
  
+ ${ElseIf} $DistroName == "Wifislax (Wireless Penetration Testing)"
+ CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO" 
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/wifislax.lst$\r$\n#end $JustISOName" $R0   
+ File /oname=$PLUGINSDIR\wifislax.lst "Menu\wifislax.lst"  
+ CopyFiles "$PLUGINSDIR\wifislax.lst" "$BootDir\multiboot\menu\wifislax.lst" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\menu\wifislax.lst"  
+ 
+ ${ElseIf} $DistroName == "OSFClone (Disk Cloning Tool)"
+ CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO" 
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/osfclone.lst$\r$\n#end $JustISOName" $R0   
+ File /oname=$PLUGINSDIR\osfclone.lst "Menu\osfclone.lst"  
+ CopyFiles "$PLUGINSDIR\osfclone.lst" "$BootDir\multiboot\menu\osfclone.lst" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\menu\osfclone.lst"   
+ 
+ ${ElseIf} $DistroName == "NetRunner"
+ CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO" 
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/netrunner.lst$\r$\n#end $JustISOName" $R0   
+ File /oname=$PLUGINSDIR\netrunner.lst "Menu\netrunner.lst"  
+ CopyFiles "$PLUGINSDIR\netrunner.lst" "$BootDir\multiboot\menu\netrunner.lst" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\menu\netrunner.lst"    
  
 ; Dr.Web Live CD
  ;${ElseIf} $DistroName == "Dr.Web LiveDisk"
@@ -454,11 +474,13 @@ FunctionEnd
 ; Unlisted ISOs
 
 # The following Grub at Partition 4 entry adds a 4th partition table to the USB device and uses this as a placeholder for the ISO. 
-# Entry derived from Information obtained from Steve of rmprepusb.com. Steve said the following were his original sources: http://reboot.pro/topic/9916-grub4dos-isohybrided/page-2#entry88531 and http://reboot.pro/topic/9916-grub4dos-isohybrided/page-2#entry164127
+# Entry derived from information obtained from Steve of rmprepusb.com. Steve said the following were his original sources: http://reboot.pro/topic/9916-grub4dos-isohybrided/page-2#entry88531 and http://reboot.pro/topic/9916-grub4dos-isohybrided/page-2#entry164127
  ${ElseIf} $DistroName == "Try Unlisted ISO (GRUB Partition 4)" 
  CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO"
- ${WriteToFile} "#start $JustISOName$\r$\nparttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4%$\r$\nif %check%==0x00 partnew (hd0,3) 0 0 0$\r$\nif not %check%==0x00 echo WARNING: Fourth partion is not empty, please delete it if you wish to use this boot method! && pause --wait=5 && configfile /multiboot/menu/menu.lst$\r$\n#Modify the following entry if it does not boot$\r$\ntitle Boot $JustISOName$\r$\nset ISO=/multiboot/ISOS/$JustISO$\r$\nfind --set-root %ISO%$\r$\nparttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4% $\r$\nif %check%==0x00 partnew (hd0,3) 0x00 %ISO%$\r$\nif NOT %check%==0x00 echo ERROR: Fourth partion is not empty, please delete it if you wish to use this method! && pause --wait=5 && configfile /multiboot/menu/menu.lst$\r$\nmap  %ISO% (0xff)$\r$\nmap --hook$\r$\nroot (0xff)$\r$\nchainloader (0xff)$\r$\n#end $JustISOName" $R0
-
+ ; ${WriteToFile} "#start $JustISOName$\r$\n#Modify the following entry if it does not boot$\r$\ntitle Boot $JustISOName$\r$\nset ISO=/multiboot/ISOS/$JustISO$\r$\nfind --set-root %ISO%$\r$\nparttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4% $\r$\nif %check%==0x00 partnew (hd0,3) 0x00 %ISO%$\r$\nif NOT %check%==0x00 echo ERROR: Fourth partion is not empty, please delete it if you wish to use this method! && pause --wait=5 && configfile /multiboot/menu/grubpart4.lst$\r$\nmap %ISO% (0xff)$\r$\nmap --hook$\r$\nroot (0xff)$\r$\nchainloader (0xff)$\r$\n#end $JustISOName" $R0
+ ; ${WriteToFile} "#start $JustISOName$\r$\nparttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4%$\r$\nif %check%==0x00 partnew (hd0,3) 0 0 0$\r$\nif not %check%==0x00 echo WARNING: Fourth partion is not empty, please delete it if you wish to use this boot method! && pause --wait=5 && configfile /multiboot/menu/menu.lst$\r$\n#Modify the following entry if it does not boot$\r$\ntitle Boot $JustISOName$\r$\nset ISO=/multiboot/ISOS/$JustISO$\r$\nfind --set-root %ISO%$\r$\nparttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4% $\r$\nif %check%==0x00 partnew (hd0,3) 0x00 %ISO%$\r$\nif NOT %check%==0x00 echo ERROR: Fourth partion is not empty, please delete it if you wish to use this method! && pause --wait=5 && configfile /multiboot/menu/grubpart4.lst$\r$\nmap %ISO% (0xff)$\r$\nmap --hook$\r$\nroot (0xff)$\r$\nchainloader (0xff)$\r$\n#end $JustISOName" $R0
+ ${WriteToFile} "#start $JustISOName$\r$\n#Modify the following entry if it does not boot$\r$\ntitle Boot $JustISOName$\r$\nset ISO=/multiboot/ISOS/$JustISO$\r$\nfind --set-root %ISO%$\r$\n$\r$\nparttype (hd0,3) | set check=$\r$\nset check=%check:~-5,4%$\r$\nif $\"%check%$\"==$\"0x00$\" partnew (hd0,3) 0 0 0$\r$\nif NOT $\"%check%$\"==$\"0x00$\" echo ERROR: Fourth partion table is not empty, please delete it if you wish to use this method && pause --wait=5 && configfile /multiboot/menu/grubpart4.lst$\r$\npartnew (hd0,3) 0x00 %ISO%$\r$\nmap %ISO% (0xff)$\r$\nmap --hook$\r$\nroot (0xff)$\r$\nchainloader (0xff)$\r$\n#end $JustISOName" $R0
+ 
  ${ElseIf} $DistroName == "Try Unlisted ISO (GRUB)" 
  CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO"
  ${WriteToFile} "#start $JustISOName$\r$\n#Modify the following entry if it does not boot$\r$\ntitle Boot $JustISO$\r$\nfind --set-root --ignore-floppies --ignore-cd /multiboot/ISOS/$JustISO$\r$\nmap --heads=0 --sectors-per-track=0 /multiboot/ISOS/$JustISO (hd32)$\r$\nmap --hook$\r$\nchainloader (hd32)$\r$\n#end $JustISOName" $R0 
@@ -715,7 +737,7 @@ FunctionEnd
    !insertmacro ReplaceInFile "initrd=/boot" "initrd=/multiboot/$JustISOName/boot" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    ${EndIf}
    
-; WifiSlax ; Entry initially populated by Lance, completed and submitted by Geminis Demon - continued fixes and updates by Lance 
+; WifiSlax Old Entry, Initially populated by Lance, completed and submitted by Geminis Demon - continued fixes and updates by Lance 
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\boot\menus\wifislax.cfg"  
    !insertmacro ReplaceInFile "/boot/" "/multiboot/$JustISOName/NULL/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\syslinux\syslinux.cfg" 
    !insertmacro ReplaceInFile "/NULL/" "/boot/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\syslinux\syslinux.cfg"     
@@ -777,10 +799,19 @@ FunctionEnd
    !insertmacro ReplaceInFile "INITRD /boot/core.gz" "INITRD /multiboot/$JustISOName/boot/core.gz" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"     
    ${EndIf}
    
-   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\boot\tinycore.gz" ; Partition Wizard, TinyCore specific
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\boot\tinycore.gz" ; Partition Wizard, TinyCore specific 
    !insertmacro ReplaceInFile "initrd=/boot/tinycore.gz" "initrd=/multiboot/$JustISOName/boot/tinycore.gz" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    !insertmacro ReplaceInFile "INITRD /boot/tinycore.gz" "INITRD /multiboot/$JustISOName/boot/tinycore.gz" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"     
    ${EndIf}   
+   
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\casper\tinycore.gz" ; Partition Wizard specific 
+   !insertmacro ReplaceInFile "initrd=/casper/tinycore.gz" "initrd=/multiboot/$JustISOName/casper/tinycore.gz" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+   !insertmacro ReplaceInFile "INITRD /casper/tinycore.gz" "INITRD /multiboot/$JustISOName/casper/tinycore.gz" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"     
+    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\casper\vmlinuz.efi" 
+	${OrIf} ${FileExists} "$BootDir\multiboot\$JustISOName\casper\vmlinuz"  
+    !insertmacro ReplaceInFile "kernel /casper" "kernel /multiboot/$JustISOName/casper" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+    ${EndIf}   
+   ${EndIf}       
    
 ; F-Secure Rescue CD
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\boot\isolinux\fsecure\linux"  
@@ -853,8 +884,8 @@ FunctionEnd
    ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\antiX\vmlinuz"  
    !insertmacro ReplaceInFile "/antiX/vmlinuz" "/multiboot/$JustISOName/antiX/vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
    !insertmacro ReplaceInFile "INITRD /antiX" "INITRD /multiboot/$JustISOName/antiX" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile" 
-   !insertmacro ReplaceInFile "APPEND quiet" "APPEND image_dir=/multiboot/$JustISOName/antiX" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
-   !insertmacro ReplaceInFile "UI gfxboot" "default vesamenu.c32 $\r$\nprompt 0 #" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"    
+   !insertmacro ReplaceInFile "APPEND quiet" "APPEND bdir=/multiboot/$JustISOName/antiX" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"  
+   ;!insertmacro ReplaceInFile "UI gfxboot" "default vesamenu.c32 $\r$\nprompt 0 #" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"    
    ${EndIf}   
    
 ; Archlinux
@@ -1371,8 +1402,8 @@ FunctionEnd
  
 ; Xiaopan 
   ${ElseIf} $DistroName == "Xiaopan (Penetration Testing)"   
-  CopyFiles "$BootDir\multiboot\$JustISOName\cde\*.*" "$BootDir\cde\" ;(quick hack until a cde bootcode/cheatcode is made upstream from tinyCore)
-  CopyFiles "$BootDir\multiboot\$JustISOName\mydata.tgz" "$BootDir\mydata.tgz"
+  ;CopyFiles "$BootDir\multiboot\$JustISOName\cde\*.*" "$BootDir\cde\" ;(quick hack until a cde bootcode/cheatcode is made upstream from tinyCore)
+  ;CopyFiles "$BootDir\multiboot\$JustISOName\mydata.tgz" "$BootDir\mydata.tgz"
   !insertmacro ReplaceInFile "MENU BACKGROUND /boot/isolinux/splash.jpg" "MENU BACKGROUND /multiboot/$JustISOName/boot/isolinux/splash.jpg" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"
   !insertmacro ReplaceInFile "MENU BACKGROUND /boot/isolinux/splash.jpg" "MENU BACKGROUND /multiboot/$JustISOName/boot/isolinux/splash.jpg" "all" "all" "$BootDir\multiboot\$JustISOName\$CopyPath\$ConfigFile"
   

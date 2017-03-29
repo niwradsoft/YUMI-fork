@@ -1,9 +1,9 @@
 default 0
 timeout=0
 
-#start bitdefender-rescue-cd
+#start wifislax
 
-title Boot Bitdefender
+title Boot wifislax
 set ISO=/multiboot/ISOS/SLUG
 find --set-root %ISO%
 
@@ -15,7 +15,6 @@ partnew (hd0,3) 0x00 %ISO%
 
 map  %ISO% (0xff)
 map --hook
-kernel (0xff)/boot/kernel.i386-pc root=/dev/ram0 real_root=/dev/loop0 loop=/rescue/livecd.squashfs cdroot_marker=/rescue/livecd.squashfs initrd udev cdroot scandelay=10 quiet slash lang=en
-initrd (0xff)/boot/initfs.i386-pc
+chainloader (0xff)
 
-#end bitdefender-rescue-cd
+#end wifislax
