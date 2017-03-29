@@ -24,7 +24,11 @@
   ${LineFind} "$BootDir\multiboot\Installed.txt" "$BootDir\multiboot\Installed.txt" "1:-1" "DeleteInstall" ; Remove the Installed entry
   ${LineFind} "$BootDir\multiboot\Installed.txt" "$BootDir\multiboot\Installed.txt" "1:-1" "DeleteEmptyLine" ; Remove any left over empty lines
   ${LineFind} "$BootDir\multiboot\menu\$Config2Use" "$BootDir\multiboot\menu\$Config2Use" "1:-1" "DeleteEmptyLine" ; Remove any left over empty lines
-  RMDir /R "$BootDir\multiboot\$DistroName"  
+  Delete "$BootDir\multiboot\$DistroName\*.*"
+  ;RMDir /R "$BootDir\multiboot\$DistroName"  
+  ReadEnvStr $R0 COMSPEC
+  nsExec::Exec '"$R0" /C rmdir /Q /S "$BootDir\multiboot\$DistroName"' 
+  
    ${AndIf} ${FileExists} "$BootDir\multiboot\ISOS\$DistroName.iso"   
    Delete "$BootDir\multiboot\ISOS\$DistroName.iso" 
  ${EndIf}

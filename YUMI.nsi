@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.3.6"
+!define VERSION "2.0.3.7"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -220,7 +220,7 @@ Function SelectionsPage
   ${NSD_CB_SelectString} $Distro $DistroName ; Was ${NSD_LB_SelectString} $Distro $DistroName  ; Enable For DropBox 
   
 ; Force Show All ISO Option
-  ${NSD_CreateCheckBox} 80% 100 20% 15 "Show All ISOs?"
+  ${NSD_CreateCheckBox} 80% 100 20% 9u "Show All ISOs?"
   Pop $ForceShowAll
   ${NSD_OnClick} $ForceShowAll ShowAllISOs   
 
@@ -357,7 +357,7 @@ Function SelectionsPage
   ${NSD_CB_SelectString} $Distro $DistroName ; Was ${NSD_LB_SelectString} $Distro $DistroName  ; Enable For DropBox
   
 ; Force Show All ISO Option
-  ${NSD_CreateCheckBox} 80% 100 20% 15 "Show All ISOs?"
+  ${NSD_CreateCheckBox} 80% 100 20% 9u "Show All ISOs?"
   Pop $ForceShowAll
   ${NSD_OnClick} $ForceShowAll ShowAllISOs    
 
@@ -1269,6 +1269,8 @@ Function ConfigRemove ; Find and Set Removal Configuration file
   StrCpy $Config2Use "grubram.lst"
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\win.lst"
   StrCpy $Config2Use "win.lst"  
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\pe.lst"
+  StrCpy $Config2Use "pe.lst"  
   ${EndIf}
   ; MessageBox MB_OK "$Config2Use"
 FunctionEnd
@@ -1286,6 +1288,8 @@ Function Config2Write
   ${WriteToSysFile} "label Other OS and Tools$\r$\nmenu label Other OS and Tools ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/other.cfg" $R0 
  ${ElseIf} $Config2Use == "pe.cfg"
   ${WriteToSysFile} "label Windows PE$\r$\nmenu label Windows PE ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/pe.cfg" $R0   
+ ${ElseIf} $Config2Use == "pe.lst"
+  ${WriteToSysFile} "label Windows PE$\r$\nmenu label Windows PE ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/pe.lst" $R0   
  ${ElseIf} $Config2Use == "unlisted.cfg"
   ${WriteToSysFile} "label Unlisted ISOs (via SYSLINUX)$\r$\nmenu label  Unlisted ISOs (via SYSLINUX) ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/unlisted.cfg" $R0  
  ${ElseIf} $Config2Use == "menu.lst"
@@ -1365,6 +1369,7 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\linux.cfg "menu\linux.cfg" 
   File /oname=$PLUGINSDIR\other.cfg "menu\other.cfg"   
   File /oname=$PLUGINSDIR\pe.cfg "menu\pe.cfg"    
+  File /oname=$PLUGINSDIR\pe.lst "menu\pe.lst"  
   File /oname=$PLUGINSDIR\unlisted.cfg "menu\unlisted.cfg"   
   File /oname=$PLUGINSDIR\liveusb "liveusb"   
   File /oname=$PLUGINSDIR\7zG.exe "7zG.exe"

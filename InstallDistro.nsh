@@ -350,18 +350,101 @@ FunctionEnd
    ${AndIfNot} ${FileExists} "$BootDir\bootmgr.efi" 	  
       CopyFiles $BootDir\multiboot\$JustISOName\bootmgr.efi "$BootDir\bootmgr.efi"  
   ${EndIf}   
+  
+; Windows PE (WIM) boot
+ ${ElseIf} $DistroName == "Multiple Windows PE -wimboot"
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]*' 
+  ${WriteToFile} "#start $JustISOName$\r$\ntitle $JustISOName - wimboot$\r$\nkernel /multiboot/wimboot$\r$\nkernel /multiboot/wimboot$\r$\ninitrd @bootmgr=/multiboot/$JustISOName/bootmgr @bcd=/multiboot/$JustISOName/boot/bcd @boot.sdi=/multiboot/$JustISOName/boot/boot.sdi @boot.wim=/multiboot/$JustISOName/sources/boot.wim$\r$\n#end $JustISOName" $R0   
  
-; Windows Vista/7/8/10
+; Windows PE - bootmgr at root of USB
+ ${ElseIf} $DistroName == "Multiple Windows PE -bootmgr"
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]*'    
+ 
+  ${IfNot} ${FileExists} "$BootDir\multiboot\$JustISOName\efi\microsoft\boot\bcd"
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle $JustISOName - bootmgr at root$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
+  ${Else} ; For 32bit variants
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle $JustISOName - bootmgr at root$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
+  ${Endif}
+  
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\CdUsb.Y"
+    CopyFiles $BootDir\multiboot\$JustISOName\CdUsb.Y "$BootDir\CdUsb.Y"
+  ${Endif}
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\pecmdExt.ini"
+    CopyFiles $BootDir\multiboot\$JustISOName\pecmdExt.ini "$BootDir\pecmdExt.ini"
+  ${Endif}
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\Win10PE.cd"
+    CopyFiles $BootDir\multiboot\$JustISOName\Win10PE.cd "$BootDir\Win10PE.cd"
+  ${Endif} 
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\bootmgr.exe"
+    CopyFiles $BootDir\multiboot\$JustISOName\bootmgr.exe "$BootDir\bootmgr.exe"
+  ${Endif}   
+  
+ !include "x64.nsh"
+ ${DisableX64FSRedirection} 
+ DetailPrint "bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}" 
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ DetailPrint "bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}"
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ DetailPrint 'bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} device ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ DetailPrint 'bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}' 
+ nsExec::ExecToLog '"cmd" /c bcdedit /store $BootDir/multiboot/$JustISOName/efi/microsoft/boot/bcd /set {default} osdevice ramdisk=[boot]\multiboot\$JustISOName\sources\boot.wim,{7619dcc8-fafe-11d9-b411-000476eba25f}'
+ ${EnableX64FSRedirection}   
+ 
+  ${IfNot} ${FileExists} "$BootDir\boot\bcd"
+      CreateDirectory $BootDir\boot
+	  CopyFiles $BootDir\multiboot\$JustISOName\boot\boot.sdi "$BootDir\boot\bcd" ;just copying a file large enough in size to be used for our bcd container...
+	  CopyFiles $BootDir\multiboot\$JustISOName\boot\boot.sdi "$BootDir\boot"		  
+   ${AndIfNot} ${FileExists} "$BootDir\efi\microsoft\boot\bcd"  
+      ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\efi\microsoft\boot\bcd"
+       CreateDirectory $BootDir\efi\microsoft\boot	
+	   CopyFiles $BootDir\multiboot\$JustISOName\efi\microsoft\boot\bcd "$BootDir\efi\microsoft\boot"  
+	  ${Endif}
+   ${AndIfNot} ${FileExists} "$BootDir\bootmgr"  
+      CopyFiles $BootDir\multiboot\$JustISOName\bootmgr "$BootDir\bootmgr" 
+   ${AndIfNot} ${FileExists} "$BootDir\bootmgr.efi" 	
+      ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\bootmgr.efi"
+       CopyFiles $BootDir\multiboot\$JustISOName\bootmgr.efi "$BootDir\bootmgr.efi" 
+	  ${Endif}
+  ${EndIf}    
+ 
+; Single Windows Vista/7/8/10 -files at root
  ${ElseIf} $DistroName == "Single Windows Vista/7/8/10 Installer"
  ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\" -y -x![BOOT]*' 
+ ;CreateDirectory $BootDir\multiboot\$JustISOName	
+ CopyFiles "$BootDir\bootmgr" "$BootDir\multiboot\$JustISOName"
+ CopyFiles "$BootDir\boot" "$BootDir\multiboot\$JustISOName"
+ 
+  ${IfNot} ${FileExists} "$BootDir\efi\microsoft\boot\bcd"
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Start $JustISOName - Single Installer$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
+  ${Else} 
+   CopyFiles "$BootDir\bootmgr.efi" "$BootDir\multiboot\$JustISOName"
+   CopyFiles "$BootDir\efi" "$BootDir\multiboot\$JustISOName"
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Start $JustISOName - Single Installer$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
+  ${Endif}
+  
+; Single Windows PE -files at root
+ ${ElseIf} $DistroName == "Single Windows PE"
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\" -y -x![BOOT]*' 	
+ CopyFiles "$BootDir\bootmgr" "$BootDir\multiboot\$JustISOName"
+ CopyFiles "$BootDir\boot" "$BootDir\multiboot\$JustISOName"
+ 
+  ${IfNot} ${FileExists} "$BootDir\efi\microsoft\boot\bcd"
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Start $JustISOName - Single PE$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
+  ${Else} 
+   CopyFiles "$BootDir\bootmgr.efi" "$BootDir\multiboot\$JustISOName"
+   CopyFiles "$BootDir\efi" "$BootDir\multiboot\$JustISOName"
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Start $JustISOName - Single PE$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
+  ${Endif}  
+  
 ; For Syslinux ---- ${WriteToFile} "#start $JustISOName$\r$\nLABEL Windows Vista/7/8 Installer$\r$\nMENU LABEL Windows Vista/7/8/10 Installer$\r$\nMENU INDENT 1$\r$\nCOM32 /multiboot/chain.c32 fs ntldr=/bootmgr$\r$\n#end $JustISOName" $R0  
 ; CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO"
- ${WriteToFile} "title$\r$\nroot$\r$\n#start $JustISOName$\r$\ntitle Start $JustISOName Installer$\r$\nchainloader /bootmgr$\r$\n#end $JustISOName" $R0  
+ ; ${WriteToFile} "title$\r$\nroot$\r$\n#start $JustISOName$\r$\ntitle Start $JustISOName Single Installer$\r$\nchainloader /bootmgr$\r$\n#end $JustISOName" $R0  
 ; File /oname=$PLUGINSDIR\firadisk.img "firadisk.img"  
 ; CopyFiles "$PLUGINSDIR\firadisk.img" "$BootDir\multiboot\ISOS\firadisk.img"   
 
 ; Windows XP
- ${ElseIf} $DistroName == "Windows XP Installer" 
+ ${ElseIf} $DistroName == "Single Windows XP Installer" 
  CopyFiles $ISOFile "$BootDir\multiboot\ISOS\$JustISO"
  ${WriteToFile} "title$\r$\nroot$\r$\n#start $JustISOName$\r$\ntitle Begin Install of Windows XP from $JustISO (Stage 1)$\r$\nfind --set-root /multiboot/ISOS/$JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --mem /multiboot/ISOS/firadisk.img (fd0)$\r$\nmap --mem /multiboot/ISOS/firadisk.img (fd1)$\r$\nmap --mem /multiboot/ISOS/$JustISO (0xff)$\r$\nmap --hook$\r$\nchainloader (0xff)/I386/SETUPLDR.BIN$\r$\n$\r$\ntitle Continue Windows XP Install from $JustISO (Stage 2)$\r$\nfind --set-root /multiboot/ISOS/$JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --mem /multiboot/ISOS/$JustISO (0xff)$\r$\nmap --hook$\r$\nchainloader (hd0)+1$\r$\n$\r$\ntitle Boot Windows XP - If fails, reboot with USB removed (Stage 3)$\r$\nmap (hd1) (hd0)$\r$\nmap (hd0) (hd1)$\r$\nroot (hd1,0)$\r$\nfind --set-root /ntldr$\r$\nchainloader /ntldr$\r$\n#end $JustISOName" $R0  
  File /oname=$PLUGINSDIR\firadisk.img "firadisk.img"  
