@@ -1,7 +1,7 @@
 YUMI (Your Universal Multiboot Integrator) ©2011-2016 Lance www.pendrivelinux.com
 This Open Source tool is covered under GNU General Public License Version 2
 Source Code is made available at time of download from the official YUMI page:
-http://www.pendrivelinux.com/yumi-multiboot-usb-creator/
+https://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 IMPORTANT! ABSOLUTELY NO WARRANTY IS BEING OFFERED WITH THIS TOOL:
 
@@ -29,8 +29,9 @@ Fat32format.exe © Tom Thornhill Ridgecorp Consultants http://www.ridgecrop.demon
 Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/
 dd.exe © John Newbigin http://www.chrysocome.net/
 mke2fs © Matt <mattwu@163.com> http://www.ext2fsd.com
+iPXE wimboot © Michael Brown and the iPXE project team http://ipxe.org/wimboot
 
-YUMI, Grub, Fat32format, dd, mke2fs, and Syslinux covered under GNU GPL version 2
+YUMI, GRUB4DOS, Fat32format, dd, mke2fs, wimboot, and Syslinux covered under GNU GPL version 2
 7-zip is covered under an LGPL + AES License - see the License following GNU GPL 2
 Firadisk is covered under GNU GPL version 3
 

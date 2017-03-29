@@ -224,19 +224,24 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Hiren's Boot CD" "Hiren*.iso" "NONE" "NULL" "other.cfg" "" ""
  !insertmacro SetISOFileNames "Kon-Boot FREE" "kon-boot*free.zip" "https://www.dropbox.com/s/f5i4g9vlmwoxrtp/kon-boot1.1-free.zip" "NULL" "other.cfg" "http://www.piotrbania.com/all/kon-boot/" "Kon-Boot" 
  !insertmacro SetISOFileNames "Kon-Boot Purchased" "kon-boot*.exe" "NONE" "NULL" "other.cfg" "http://www.piotrbania.com/all/kon-boot/" "Kon-Boot" 
-
-; For Syslinux --- !insertmacro SetISOFileNames "Windows Vista/7/8" "*.iso" "NONE" "NULL" "other.cfg" "" ""
- !insertmacro SetISOFileNames "Windows 10 Installer" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
- !insertmacro SetISOFileNames "Windows Vista/7/8 Installer" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
- !insertmacro SetISOFileNames "Windows XP Installer" "*.iso" "NONE" "NULL" "menu.lst" "" ""  
  
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
-     !insertmacro SetISOFileNames "--- Unlisted Bootable ISOs ---" "" "" "" "" "" ""
-     !insertmacro SetISOFileNames "" "" "" "" "" "" "" 	
-
+     !insertmacro SetISOFileNames "--- Windows PE and Installers ---" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "" "" "" "" "" "" ""
+	 
+ ;!insertmacro SetISOFileNames "Windows 10 Installer" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
+; For Syslinux --- !insertmacro SetISOFileNames "Windows Vista/7/8" "*.iso" "NONE" "NULL" "other.cfg" "" ""
+ !insertmacro SetISOFileNames "Windows PE" "*.iso" "NONE" "NULL" "pe.cfg" "" ""   
+ !insertmacro SetISOFileNames "Windows Vista/7/8/10 Installer" "*.iso" "NONE" "NULL" "win.lst" "" "" 
+ !insertmacro SetISOFileNames "Windows XP Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""  
+ 
+     !insertmacro SetISOFileNames "" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "--- Try an Unlisted ISO ---" "" "" "" "" "" ""
+     !insertmacro SetISOFileNames "" "" "" "" "" "" "" 	 
+ 
  !insertmacro SetISOFileNames "Try Unlisted ISO (via SYSLINUX)" "*.iso" "NONE" "NULL" "unlisted.cfg" "" "" 	 
- !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB Partition 4)" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
+ !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB Partition 4)" "*.iso" "NONE" "NULL" "grubpart4.lst" "" "" 
  !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB)" "*.iso" "NONE" "NULL" "menu.lst" "" "" 
- !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB from RAM)" "*.iso" "NONE" "NULL" "menu.lst" "" ""  
+ !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB from RAM)" "*.iso" "NONE" "NULL" "grubram.lst" "" ""  
  
 FunctionEnd

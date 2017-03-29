@@ -20,13 +20,14 @@
   Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/ (unmodified binary used)
   grub.exe Grub4DOS © the Gna! people + Chenall https://code.google.com/p/grub4dos-chenall/ (unmodified binary used) : Official Grub4DOS: http://gna.org/projects/grub4dos/
   Fat32format.exe © Tom Thornhill Ridgecorp Consultants http://www.ridgecrop.demon.co.uk (unmodified binary used)
+  iPXE wimboot © Michael Brown and the iPXE project team http://ipxe.org/wimboot
   NSIS Installer © Contributors http://nsis.sourceforge.net - Install NSIS to compile this script. http://nsis.sourceforge.net/Download
   YUMI may contain remnants of Cedric Tissieres's Tazusb.exe for Slitaz (slitaz@objectif-securite.ch), as his work was used as a base for singular distro installers that preceded YUMI. 
  */
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.3.4"
+!define VERSION "2.0.3.5"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -82,6 +83,7 @@ Var ISOSelection
 Var ISOTest
 Var JustISO
 Var JustISOName
+Var InUnName
 Var JustISOPath
 Var ConfigFile
 Var ConfigPath
@@ -110,6 +112,7 @@ Var OnlyVal
 Var Uninstaller
 Var Removal
 Var InUnStall
+Var OnFrom
 Var SUSEDIR
 Var RepeatInstall
 Var ShowAll
@@ -182,10 +185,10 @@ LangString ExecuteSyslinux ${LANG_ENGLISH} "Executing syslinux on $BootDir"
 LangString SkipSyslinux ${LANG_ENGLISH} "Good Syslinux Exists..."
 LangString WarningSyslinux ${LANG_ENGLISH} "An error ($R8) occurred while executing syslinux.$\r$\nYour USB drive won't be bootable..."
 LangString WarningSyslinuxOLD ${LANG_ENGLISH} "This YUMI revision uses a newer Syslinux version that is not compatible with earlier revisions.$\r$\nPlease ensure your USB drive doesn't contain earlier revision installs."
-LangString Install_Title ${LANG_ENGLISH} "$InUnStall $ISOFileName"
-LangString Install_SubTitle ${LANG_ENGLISH} "Please wait while we $InUnStall $DistroName on $JustDrive"
-LangString Install_Finish_Sucess ${LANG_ENGLISH} "${NAME} sucessfully $InUnStalled $DistroName on $JustDrive"
-LangString Finish_Install ${LANG_ENGLISH} "$InUnStallation is Complete."
+LangString Install_Title ${LANG_ENGLISH} "$InUnStall $InUnName"
+LangString Install_SubTitle ${LANG_ENGLISH} "Please wait while we $InUnStall $InUnName $OnFrom $JustDrive"
+LangString Install_Finish_Sucess ${LANG_ENGLISH} "${NAME} $InUnStalled $InUnName $OnFrom $JustDrive"
+LangString Finish_Install ${LANG_ENGLISH} "$InUnStallation Complete."
 LangString Finish_Title ${LANG_ENGLISH} "${NAME} has completed the $InUnStallation."
 LangString Finish_Text ${LANG_ENGLISH} "Your Selections have been $InUnStalled on your USB drive.$\r$\n$\r$\nFeel Free to run this tool again to $InUnStall more Distros.$\r$\n$\r$\nYUMI will keep track of selections you have already $InUnStalled."
 LangString Finish_Link ${LANG_ENGLISH} "Visit the YUMI Home Page"
@@ -213,7 +216,7 @@ Function SelectionsPage
   Pop $Uninstaller
   ${NSD_OnClick} $Uninstaller Uninstall  
 
- ; Distro Selection Starts
+; Distro Selection Starts
   ${NSD_CreateLabel} 0 50 50% 15 $(Distro_Text) 
   Pop $LinuxDistroSelection   
 
@@ -505,7 +508,9 @@ Function EnableNext ; Enable Install Button
     ${AndIf} $ISOFile != ""
      ${AndIf} $DestDrive != "" 
 	  ${AndIf} $ISOTest != ""
-  StrCpy $InUnStall "Install"	  
+  StrCpy $InUnStall "Install"	
+  StrCpy $OnFrom "on"
+  StrCpy $InUnName "$JustISOName"
   GetDlgItem $6 $HWNDPARENT 1 ; Get "Install" control handle
    SendMessage $6 ${WM_SETTEXT} 0 "STR:Create"
     EnableWindow $6 1 ; Enable "Install" control button
@@ -514,7 +519,9 @@ Function EnableNext ; Enable Install Button
    ${AndIf} $ISOFileName != ""
      ${AndIf} $DestDrive != "" 
 	  ${AndIf} $ISOTest != ""
-  StrCpy $InUnStall "UnInstall"	  
+  StrCpy $InUnStall "Uninstall"	  
+  StrCpy $OnFrom "from"	
+  StrCpy $InUnName "$DistroName"
   GetDlgItem $6 $HWNDPARENT 1 ; Get "Install" control handle
    SendMessage $6 ${WM_SETTEXT} 0 "STR:Remove"
     EnableWindow $6 1 ; Enable "Install" control button
@@ -661,6 +668,12 @@ Function OnSelectDistro
   ShowWindow $DistroLink 1
   ${EndIf}    
   
+  ${If} $DistroName != ""
+  ${NSD_SetText} $LinuxDistroSelection "Step 2: $DistroName Selected"
+  ${Else}
+  ${NSD_SetText} $LinuxDistroSelection "Step 2: Select a Distribution to put on $DestDisk"
+  ${EndIf}    
+  
 ; Autodetect ISO's in same folder and select if they exist  
  ${If} ${FileExists} "$EXEDIR\$ISOFileName"
  ${AndIf} $Removal != "Yes"
@@ -670,6 +683,8 @@ Function OnSelectDistro
   StrCpy $ISOFile "$TheISO"  
   ${GetFileName} "$TheISO" $JustISO
   ${GetBaseName} "$JustISO" $JustISOName
+${StrRep} '$JustISOName' '$JustISOName' ' ' '-'
+;MessageBox MB_OK $JustISOName 
   ${GetParent} "$TheISO" $JustISOPath  
   EnableWindow $DownloadISO 0
   ${NSD_SetText} $DownloadISO "We Found and Selected the $SomeFileExt."    
@@ -727,6 +742,8 @@ Function ISOBrowse
  StrCpy $ISOFile "$TheISO" 
  ${GetFileName} "$TheISO" $JustISO
  ${GetBaseName} "$JustISO" $JustISOName
+${StrRep} '$JustISOName' '$JustISOName' ' ' '-'
+;MessageBox MB_OK $JustISOName 
  ${GetParent} "$TheISO" $JustISOPath
  StrCpy $LocalSelection "Yes"
   Call SetISOSize
@@ -736,6 +753,12 @@ Function ISOBrowse
  ${If} $JustISOName == "" 
  StrCpy $JustISOName "NULL" ; Set to NULL until something is selected
  ${EndIf}
+ 
+ ${If} $JustISO != ""
+ ${NSD_SetText} $LabelISOSelection "Step 3: $JustISO Selected"
+ ${Else}
+ ${NSD_SetText} $LabelISOSelection "Step 3: Select your $ISOFileName"
+ ${EndIf} 
  
  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\*.*"
  ${AndIf} $JustISOName != ""
@@ -788,7 +811,6 @@ Function Uninstall
 	SendMessage $6 ${WM_SETTEXT} 0 "STR:Remove"
 	EnableWindow $6 0 ; Disable "Install" control button
   ${NSD_SetText} $Uninstaller "You're in Uninstaller Mode!"
-   ${NSD_SetText} $LinuxDistroSelection "Step 2: Select a Distribution to remove from $DestDisk"  
     SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new option may have been chosen ; Enable for DropBox
      StrCpy $Checker "Yes"   
 	 Call RemovalList
@@ -1106,7 +1128,10 @@ Function DoSyslinux ; Install Syslinux on USB
   CopyFiles "$PLUGINSDIR\chain.c32" "$BootDir\multiboot\chain.c32"
   CopyFiles "$PLUGINSDIR\libcom32.c32" "$BootDir\multiboot\libcom32.c32"  
   CopyFiles "$PLUGINSDIR\libutil.c32" "$BootDir\multiboot\libutil.c32"   
+  CopyFiles "$PLUGINSDIR\linux.c32" "$BootDir\multiboot\linux.c32"     
   CopyFiles "$PLUGINSDIR\memdisk" "$BootDir\multiboot\memdisk"
+  CopyFiles "$PLUGINSDIR\wimboot" "$BootDir\multiboot\wimboot"
+ 
 ; Copy these files to multiboot\menu
   ; DetailPrint "Adding required files to the $BootDir\multiboot\menu directory..." 
   ; CopyFiles "$PLUGINSDIR\vesamenu.c32" "$BootDir\multiboot\menu\vesamenu.c32"
@@ -1230,10 +1255,18 @@ Function ConfigRemove ; Find and Set Removal Configuration file
   StrCpy $Config2Use "netbook.cfg"
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\other.cfg"
   StrCpy $Config2Use "other.cfg"
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\pe.cfg"
+  StrCpy $Config2Use "pe.cfg"
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\unlisted.cfg"
   StrCpy $Config2Use "unlisted.cfg"  
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\menu.lst"
   StrCpy $Config2Use "menu.lst"
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\grubpart4.lst"
+  StrCpy $Config2Use "grubpart4.lst"
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\grubram.lst"
+  StrCpy $Config2Use "grubram.lst"
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\win.lst"
+  StrCpy $Config2Use "win.lst"  
   ${EndIf}
   ; MessageBox MB_OK "$Config2Use"
 FunctionEnd
@@ -1249,10 +1282,18 @@ Function Config2Write
   ${WriteToSysFile} "label Netbook Distributions$\r$\nmenu label Netbook Distributions ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/netbook.cfg" $R0 
  ${ElseIf} $Config2Use == "other.cfg"
   ${WriteToSysFile} "label Other OS and Tools$\r$\nmenu label Other OS and Tools ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/other.cfg" $R0 
+ ${ElseIf} $Config2Use == "pe.cfg"
+  ${WriteToSysFile} "label Windows PE$\r$\nmenu label Windows PE ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/pe.cfg" $R0   
  ${ElseIf} $Config2Use == "unlisted.cfg"
-  ${WriteToSysFile} "label Unlisted ISO (via SYSLINUX)$\r$\nmenu label  Unlisted ISO (via SYSLINUX) ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/unlisted.cfg" $R0  
+  ${WriteToSysFile} "label Unlisted ISOs (via SYSLINUX)$\r$\nmenu label  Unlisted ISOs (via SYSLINUX) ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/unlisted.cfg" $R0  
  ${ElseIf} $Config2Use == "menu.lst"
-  ${WriteToSysFile} "label GRUB Bootable ISOs$\r$\nmenu label GRUB Bootable ISOs and Windows XP/7/8 ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/menu.lst" $R0 
+  ${WriteToSysFile} "label Unlisted ISOs (via GRUB)$\r$\nmenu label Unlisted ISOs (via GRUB) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/menu.lst" $R0 
+ ${ElseIf} $Config2Use == "grubpart4.lst"
+  ${WriteToSysFile} "label Unlisted ISOs (via GRUB Partition 4)$\r$\nmenu label Unlisted ISOs (via GRUB Partition 4) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/grubpart4.lst" $R0
+ ${ElseIf} $Config2Use == "grubram.lst"
+  ${WriteToSysFile} "label Unlisted ISOs (via GRUB from RAM)$\r$\nmenu label Unlisted ISOs (via GRUB from RAM) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/grubram.lst" $R0   
+ ${ElseIf} $Config2Use == "win.lst"
+  ${WriteToSysFile} "label Windows Installer$\r$\nmenu label Windows Installer ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/win.lst" $R0  
  ${EndIf} 
 FunctionEnd
 
@@ -1310,7 +1351,10 @@ StrCpy $R9 0 ; we start on page 0
 ;  File /oname=$PLUGINSDIR\paypal.bmp "paypal.bmp"   
   File /oname=$PLUGINSDIR\syslinux.exe "syslinux.exe"  
   File /oname=$PLUGINSDIR\syslinux.cfg "syslinux.cfg"
-  File /oname=$PLUGINSDIR\menu.lst "menu.lst"  
+  File /oname=$PLUGINSDIR\menu.lst "menu\menu.lst"  
+  File /oname=$PLUGINSDIR\grubpart4.lst "menu\grubpart4.lst"  
+  File /oname=$PLUGINSDIR\grubram.lst "menu\grubram.lst"    
+  File /oname=$PLUGINSDIR\win.lst "menu\win.lst"    
   File /oname=$PLUGINSDIR\grub.exe "grub.exe"  
   File /oname=$PLUGINSDIR\info "menu\info"   
   File /oname=$PLUGINSDIR\antivirus.cfg "menu\antivirus.cfg" 
@@ -1318,6 +1362,7 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\netbook.cfg "menu\netbook.cfg"
   File /oname=$PLUGINSDIR\linux.cfg "menu\linux.cfg" 
   File /oname=$PLUGINSDIR\other.cfg "menu\other.cfg"   
+  File /oname=$PLUGINSDIR\pe.cfg "menu\pe.cfg"    
   File /oname=$PLUGINSDIR\unlisted.cfg "menu\unlisted.cfg"   
   File /oname=$PLUGINSDIR\liveusb "liveusb"   
   File /oname=$PLUGINSDIR\7zG.exe "7zG.exe"
@@ -1331,7 +1376,9 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\memdisk "memdisk" 
   File /oname=$PLUGINSDIR\chain.c32 "chain.c32" 
   File /oname=$PLUGINSDIR\libcom32.c32 "libcom32.c32"  
-  File /oname=$PLUGINSDIR\libutil.c32 "libutil.c32"    
+  File /oname=$PLUGINSDIR\libutil.c32 "libutil.c32"   
+  File /oname=$PLUGINSDIR\linux.c32 "linux.c32"  
+  File /oname=$PLUGINSDIR\wimboot "wimboot"   
   File /oname=$PLUGINSDIR\ifcpu64.c32 "ifcpu64.c32"     
 FunctionEnd
 

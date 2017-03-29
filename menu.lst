@@ -1,11 +1,11 @@
-# This Menu created with YUMI http://www.pendrivelinux.com
+# This Menu created with YUMI https://www.pendrivelinux.com
 default 1
 timeout 30
 color NORMAL HIGHLIGHT HELPTEXT HEADING
 foreground=FFFFFF
 background=000000
 
-title --- Bootable ISOs + Windows XP/Vista/7/8 ---
+title --- Bootable ISOs + Windows XP/Vista/7/8/10 ---
 root
 
 title <-- Back to Main Menu
