@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.3.9"
+!define VERSION "2.0.4.1"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -122,6 +122,9 @@ Var RemainingSpace
 Var MaxPersist
 Var Persistence
 ;Var VolMountPoint
+Var DismountAction
+;Var VHDDisk
+Var VHDSize
 
 !include DiskVoodoo.nsh
 
@@ -191,6 +194,7 @@ LangString Finish_Link ${LANG_ENGLISH} "Visit the YUMI Home Page"
 !include FileNames.nsh ; Macro for FileNames
 !include DistroList.nsh ; List of Distributions
 !include "CasperScript.nsh" ; For creation of Persistent Casper-rw files
+!include ReplaceInFile.nsh
 
 Function License_PreFunction
   StrCpy $R8 1 ;This is the 1st page
@@ -491,8 +495,8 @@ Function DownloadIt ; Set Download Option
 FunctionEnd
 
 Function EnableNext ; Enable Install Button
-  ${If} $Blocksize >= 4 
-  ${AndIf} $Removal != "Yes"
+  ;${If} $Blocksize >= 4 
+  ${If} $Removal != "Yes"
   ShowWindow $Format 1 
   ${Else}
   ShowWindow $Format 0
@@ -907,19 +911,23 @@ FunctionEnd
 Function FormatYes ; If Format is checked, do something
   ${If} $FormatMe == "Yes"
  
-; Close All Open Explorer Windows 
+/* ; Close All Open Explorer Windows 
   DetailPrint "Closing All Open Explorer Windows" 
   FindWindow $R0 CabinetWClass
   IsWindow $R0 0 +3
   SendMessage $R0 ${WM_SYSCOMMAND} 0xF060 0
-  Goto -3
+  Goto -3 */
+  !insertmacro ReplaceInFile "DSK" "$DestDisk" "all" "all" "$PLUGINSDIR\diskpartformat.txt" 
+  StrCpy $DismountAction "WIPE_FORMAT"
+  Call Lock_Dismount ; Lock and Dismount Volume
+  Call UnLockVol ; Unlock to allow Access
   
-  ;Call PhysDrive2 ; Lock and Unmount drive
-  ;Call PhysDrive3 ; Unlock drive
-  SetShellVarContext all
-  InitPluginsDir
-  File /oname=$PLUGINSDIR\fat32format.exe "fat32format.exe"  
-  DetailPrint "Formatting $DestDisk as Fat32 using Fat32format.exe"
+  Sleep 1000
+ ;ToDO - Need to make a checkpoint here to test if is greater than Win XP (Vista or later OS?). XP doesn't support Diskpart on removable disks.
+  nsExec::ExecToLog '"DiskPart" /S $PLUGINSDIR\diskpartformat.txt'
+  Sleep 1000  
+ 
+  DetailPrint "Formatting $DestDisk as Fat32. This may take a while, please be patient..."
   nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format $DestDisk"' ;/Q /y
   ;nsExec::ExecToLog '"cmd" /c "echo y|$PLUGINSDIR\fat32format -c$BlockSize $DestDisk"' ;/Q /y
   ${EndIf}   
@@ -931,14 +939,15 @@ Function FormatIt ; Set Format Option
   ${NSD_Check} $Format
     StrCpy $FormatMe "Yes"
   ${NSD_SetText} $Format "We Will Fat32 Format $DestDisk Drive!"
-    SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
+    ; SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
 	ShowWindow $Uninstaller 0 ; Disable Uninstaller option because we will be formatting the drive.
     StrCpy $Checker "Yes"	
+	Call SetSpace
   
   ${ElseIf} $FormatMe == ${BST_UNCHECKED}
   ${NSD_Uncheck} $Format 
   ${NSD_SetText} $Format "Format $DestDisk Drive (Erase Content)?"  
-    SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
+    ; SendMessage $Distro ${CB_RESETCONTENT} 0 0 ; was ${NSD_LB_Clear} $Distro "" ; Clear all distro entries because a new format option may have been chosen ; Enable for DropBox
     ShowWindow $Uninstaller 1 ; Re-enable Uninstaller option.
 	StrCpy $Checker "Yes" 
 	Call SetSpace
@@ -994,6 +1003,7 @@ ${EndIf}
 FunctionEnd
 
 Function SetSpace ; Set space available for persistence
+${If} $FormatMe != "Yes"
   ;StrCpy $0 '$0'
   Call FreeDiskSpace
   IntOp $MaxPersist 4090 + $CasperSize ; Space required for distro and 4GB max persistent file
@@ -1005,16 +1015,21 @@ Function SetSpace ; Set space available for persistence
  ${EndIf}
   IntOp $RemainingSpace $RemainingSpace - 1 ; Subtract 1MB so that we don't error for not having enough space
   SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 $RemainingSpace ; Re-Setting Max Value
+${Else}
+ SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 4090 ; Re-Setting Max Value
+${EndIf}   
 FunctionEnd
 
 Function HaveSpacePre ; Check space required
+ ${If} $FormatMe != "Yes" ; FIXME: Need to find a better method to check disk space when the drive appears unformatted (I.E. after it's been dd'd, etc).
   Call CasperSize
   Call FreeDiskSpace
   System::Int64Op $1 > $SizeOfCasper ; Compare the space available > space required
   Pop $3 ; Get the result ...
   IntCmp $3 1 okay ; ... and compare it
-  MessageBox MB_ICONSTOP|MB_OK "Oops: There is not enough disk space! $1 MB Free, $SizeOfCasper MB Needed on $JustDrive Drive."
+  MessageBox MB_ICONSTOP|MB_OK "Oops: There is not enough disk space! $1 MB Free, $SizeOfCasper MB Needed on $JustDrive Drive. Do you need to format it?"
   okay: ; Proceed to execute...
+ ${EndIf}
 FunctionEnd
 
 Function HaveSpace ; Check space required
@@ -1217,7 +1232,7 @@ Pop $NameThatISO
  
 checkpoint:
  ${If} $FormatMe == "Yes" 
- MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: To reduce the risk of losing data, you must save and close all open work before proceeding! YUMI will proceed to automatically terminate any open Explorer Windows so that drive ($DestDisk) can be successfully Fat32 Formatted!$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Fat32 Format ($DestDisk) - All Data will be Irrecoverably Deleted!$\r$\n$\r$\n2. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n3. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n4. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
+ MessageBox MB_YESNO|MB_ICONEXCLAMATION "WARNING: To reduce the risk of losing data, you must save and close all open work before proceeding! YUMI will attempt to lock and dismount ($DestDisk) so it can be successfully Fat32 Formatted!$\r$\n$\r$\n${NAME} is Ready to perform the following actions:$\r$\n$\r$\n1. Fat32 Format ($DestDisk) - All Data will be Irrecoverably Deleted!$\r$\n$\r$\n2. Create a Syslinux MBR on ($DestDisk) - Existing MBR will be Overwritten!$\r$\n$\r$\n3. Create MULTIBOOT Label on ($DestDisk) - Existing Label will be Overwritten!$\r$\n$\r$\n4. Install ($DistroName) on ($DestDisk)$\r$\n$\r$\nAre you absolutely positive Drive ($DestDisk) is your USB Device?$\r$\nDouble Check with Windows (My Computer) to make sure!$\r$\n$\r$\nClick YES to perform these actions on ($DestDisk) or NO to Go Back!" IDYES proceed
  Quit
  ${ElseIf} $FormatMe != "Yes" 
  ${AndIfNot} ${FileExists} $BootDir\multiboot\syslinux.cfg
@@ -1227,8 +1242,8 @@ checkpoint:
 
 proceed: 
  ${IfThen} $Removal == "Yes" ${|} Goto removeonly ${|}
- Call HaveSpace ; Got enough Space? Lets Check!
  Call FormatYes ; Format the Drive?
+ Call HaveSpace ; Got enough Space? Lets Check! 
  Call DoSyslinux ; Run Syslinux on the Drive to make it bootable
  Call LocalISODetected
  
@@ -1265,6 +1280,8 @@ Function ConfigRemove ; Find and Set Removal Configuration file
   StrCpy $Config2Use "unlisted.cfg"  
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\menu.lst"
   StrCpy $Config2Use "menu.lst"
+  ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\vhd.lst"
+  StrCpy $Config2Use "vhd.lst"
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\grubpart4.lst"
   StrCpy $Config2Use "grubpart4.lst"
   ${ElseIf} ${FileExists} "$BootDir\multiboot\$DistroName\YUMI\grubram.lst"
@@ -1296,6 +1313,8 @@ Function Config2Write
   ${WriteToSysFile} "label Unlisted ISOs (via SYSLINUX)$\r$\nmenu label  Unlisted ISOs (via SYSLINUX) ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/unlisted.cfg" $R0  
  ${ElseIf} $Config2Use == "menu.lst"
   ${WriteToSysFile} "label Unlisted ISOs (via GRUB)$\r$\nmenu label Unlisted ISOs (via GRUB) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/menu.lst" $R0 
+ ${ElseIf} $Config2Use == "vhd.lst"
+  ${WriteToSysFile} "label Unlisted ISOs (via Virtual Hard Disk)$\r$\nmenu label Unlisted ISOs (via Virtual Hard Disk) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/vhd.lst" $R0 
  ${ElseIf} $Config2Use == "grubpart4.lst"
   ${WriteToSysFile} "label Unlisted ISOs (via GRUB Partition 4)$\r$\nmenu label Unlisted ISOs (via GRUB Partition 4) ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/grubpart4.lst" $R0
  ${ElseIf} $Config2Use == "grubram.lst"
@@ -1356,13 +1375,19 @@ StrCpy $R9 0 ; we start on page 0
  done:
  SetShellVarContext all
  InitPluginsDir
-;  File /oname=$PLUGINSDIR\paypal.bmp "paypal.bmp"   
+;  File /oname=$PLUGINSDIR\paypal.bmp "paypal.bmp" 
+  File /oname=$PLUGINSDIR\diskpart.txt "diskpart.txt" 
+  File /oname=$PLUGINSDIR\dd-diskpart.txt "dd-diskpart.txt" 
+  File /oname=$PLUGINSDIR\diskpartformat.txt "diskpartformat.txt"   
+  File /oname=$PLUGINSDIR\diskpartdetach.txt "diskpartdetach.txt"  
+  File /oname=$PLUGINSDIR\autounattend.xml "autounattend.xml"   
   File /oname=$PLUGINSDIR\syslinux.exe "syslinux.exe"  
   File /oname=$PLUGINSDIR\syslinux.cfg "syslinux.cfg"
   File /oname=$PLUGINSDIR\menu.lst "menu\menu.lst"  
+  File /oname=$PLUGINSDIR\vhd.lst "menu\vhd.lst" 
   File /oname=$PLUGINSDIR\grubpart4.lst "menu\grubpart4.lst"  
   File /oname=$PLUGINSDIR\grubram.lst "menu\grubram.lst"    
-  File /oname=$PLUGINSDIR\win.lst "menu\win.lst"    
+  File /oname=$PLUGINSDIR\win.lst "menu\win.lst"      
   File /oname=$PLUGINSDIR\grub.exe "grub.exe"  
   File /oname=$PLUGINSDIR\info "menu\info"   
   File /oname=$PLUGINSDIR\antivirus.cfg "menu\antivirus.cfg" 
@@ -1389,9 +1414,11 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\linux.c32 "linux.c32"  
   File /oname=$PLUGINSDIR\wimboot "wimboot"   
   File /oname=$PLUGINSDIR\ifcpu64.c32 "ifcpu64.c32" 
-  File /oname=$PLUGINSDIR\remount.cmd "remount.cmd"   
+  File /oname=$PLUGINSDIR\remount.cmd "remount.cmd"  
+  File /oname=$PLUGINSDIR\vhdremount.cmd "vhdremount.cmd"    
   File /oname=$PLUGINSDIR\ei.cfg "ei.cfg"
-  
+  File /oname=$PLUGINSDIR\dd.exe "dd.exe"
+  File /oname=$PLUGINSDIR\fat32format.exe "fat32format.exe"    
   SetOutPath "$PLUGINSDIR"  
   File /r "wimlib" 
   SetOutPath ""  

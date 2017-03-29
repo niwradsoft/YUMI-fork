@@ -234,7 +234,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  ; For Syslinux --- !insertmacro SetISOFileNames "Windows Vista/7/8" "*.iso" "NONE" "NULL" "other.cfg" "" ""
  !insertmacro SetISOFileNames "Multiple Windows Vista/7/8/10 Installers -wimboot" "*.iso" "NONE" "NULL" "win.lst" "" ""  
  !insertmacro SetISOFileNames "Multiple Windows Vista/7/8/10 Installers -bootmgr" "*.iso" "NONE" "NULL" "win.lst" "" ""   
- ;!insertmacro SetISOFileNames "Single Windows Vista/7/8/10 Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""  
+ !insertmacro SetISOFileNames "Single Windows Vista/7/8/10 Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""  
  !insertmacro SetISOFileNames "Single Windows XP Installer" "*.iso" "NONE" "NULL" "win.lst" "" ""   
  
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
@@ -249,6 +249,8 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
      !insertmacro SetISOFileNames "--- Try an Unlisted ISO ---" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "" "" "" "" "" "" "" 	 
  
+; REVISIT !insertmacro SetISOFileNames "Try Unlisted ISO (Virtual Hard Disk DD)" "*.iso" "NONE" "NULL" "vhd.lst" "" ""  
+; REVISIT !insertmacro SetISOFileNames "Try Unlisted ISO (Virtual Hard Disk)" "*.iso" "NONE" "NULL" "vhd.lst" "" ""  
  !insertmacro SetISOFileNames "Try Unlisted ISO (via SYSLINUX)" "*.iso" "NONE" "NULL" "unlisted.cfg" "" "" 	 
  !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB Partition 4)" "*.iso" "NULL" "NULL" "grubpart4.lst" "" "" 
  !insertmacro SetISOFileNames "Try Unlisted ISO (GRUB)" "*.iso" "NONE" "NULL" "menu.lst" "" "" 

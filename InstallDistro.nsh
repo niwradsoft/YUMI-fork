@@ -17,7 +17,7 @@
 
 ; ------------ Install Distros Macro -------------- 
 
-!include ReplaceInFile.nsh
+; !include ReplaceInFile.nsh
 Function FindConfig ; Set config path and file
   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\liberte\boot\syslinux\syslinux.cfg" ; Liberte
   StrCpy $ConfigPath "liberte/boot/syslinux"
@@ -241,9 +241,7 @@ FunctionEnd
 ; OpenSUSE 64bit 
  ${ElseIf} $DistroName == "OpenSUSE 64bit"
  CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to ISO Directory
- ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$EXEDIR\TEMPYUMI" -y' 
- ExecWait '"$PLUGINSDIR\7zG.exe" e "$EXEDIR\TEMPYUMI\*.img" -ir!*nitrd -ir!*inux -o"$BootDir\multiboot\$JustISOName\" -y' 
- RMDir /R "$EXEDIR\TEMPYUMI" 
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!*nitrd -ir!*inux -o"$BootDir\multiboot\$JustISOName\" -y'   
  ${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/$JustISOName/linux$\r$\nAPPEND initrd=/multiboot/$JustISOName/initrd ramdisk_size=512000 ramdisk_blocksize=4096 isofrom=/dev/disk/by-label/MULTIBOOT:/multiboot/$JustISOName/$JustISO isofrom_device=/dev/disk/by-label/MULTIBOOT isofrom_system=/multiboot/$JustISOName/$JustISO loader=syslinux$\r$\n#end $JustISOName" $R0 
 
 ; OpenMediaVault - NOT WORKING YET
@@ -309,7 +307,7 @@ FunctionEnd
 ; Windows (WIM) boot
  ${ElseIf} $DistroName == "Multiple Windows Vista/7/8/10 Installers -wimboot"
  ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -o"$BootDir\multiboot\$JustISOName" -y -x![BOOT]*' 
- ; ${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nCOM32 linux.c32$\r$\nappend wimboot initrdfile=$JustISOName/bootmgr,$JustISOName/boot/bcd,$JustISOName/boot/boot.sdi,$JustISOName/sources/boot.wim$\r$\n#end $JustISOName" $R0
+  ;${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nMENU INDENT 1$\r$\nCOM32 linux.c32$\r$\nappend wimboot initrdfile=$JustISOName/bootmgr,$JustISOName/boot/bcd,$JustISOName/boot/boot.sdi,$JustISOName/sources/boot.wim$\r$\n#end $JustISOName" $R0
    ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName - wimboot$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --hook$\r$\nkernel (hd1,0)/multiboot/wimboot$\r$\nkernel (hd1,0)/multiboot/wimboot$\r$\ninitrd @bootmgr=(hd1,0)/multiboot/$JustISOName/bootmgr @bcd=(hd1,0)/multiboot/$JustISOName/boot/bcd @boot.sdi=(hd1,0)/multiboot/$JustISOName/boot/boot.sdi @boot.wim=(hd1,0)/multiboot/$JustISOName/sources/boot.wim$\r$\n#end $JustISOName" $R0   
   CopyFiles "$PLUGINSDIR\remount.cmd" "$BootDir\multiboot\$JustISOName\remount.cmd"    
   CopyFiles "$PLUGINSDIR\ei.cfg" "$BootDir\multiboot\$JustISOName\sources\ei.cfg"	  
@@ -319,8 +317,18 @@ FunctionEnd
   !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\autounattend.xml"  
   !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
   !insertmacro ReplaceInFile "BOOTDIRSLUG" "$BootDir" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"     
-  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
-  !insertmacro ReplaceInFile "$BootDir" "BOOTDIRSLUG" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt" 
+  
+  ;nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\sources\boot.wim"  
+   nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  ${Endif}   
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\x64\sources\boot.wim"  
+   nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\x64\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt'
+  ${Endif} 
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\x86\sources\boot.wim"  
+   nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\x86\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt'     
+  ${Endif} 
+  ;!insertmacro ReplaceInFile "$BootDir" "BOOTDIRSLUG" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt" 
  
 ; Windows - bootmgr at root of USB
  ${ElseIf} $DistroName == "Multiple Windows Vista/7/8/10 Installers -bootmgr"
@@ -339,8 +347,17 @@ FunctionEnd
   !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\autounattend.xml"  
   !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
   !insertmacro ReplaceInFile "BOOTDIRSLUG" "$BootDir" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+  
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\sources\boot.wim"  
   nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
-  !insertmacro ReplaceInFile "$BootDir" "BOOTDIRSLUG" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+  ${Endif}  
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\sources\x64\boot.wim"  
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\x64\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  ${Endif}  
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\sources\x86\boot.wim"  
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update $BootDir\multiboot\$JustISOName\x86\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt'     
+  ${Endif}
+  ;!insertmacro ReplaceInFile "$BootDir" "BOOTDIRSLUG" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
   
 /*   ${IfNot} ${FileExists} "$BootDir\autounattend.xml" 
   CopyFiles "$PLUGINSDIR\autounattend.xml" "$BootDir\autounattend.xml"  
@@ -369,7 +386,7 @@ FunctionEnd
       CopyFiles $BootDir\multiboot\$JustISOName\bootmgr "$BootDir\bootmgr" 
    ${AndIfNot} ${FileExists} "$BootDir\bootmgr.efi" 	  
       CopyFiles $BootDir\multiboot\$JustISOName\bootmgr.efi "$BootDir\bootmgr.efi"  
-  ${EndIf}   
+  ${EndIf}  
   
 ; Windows PE (WIM) boot
  ${ElseIf} $DistroName == "Multiple Windows PE -wimboot"
@@ -437,11 +454,11 @@ FunctionEnd
  CopyFiles "$BootDir\boot" "$BootDir\multiboot\$JustISOName"
  
   ${IfNot} ${FileExists} "$BootDir\efi\microsoft\boot\bcd"
-   ${WriteToFile} "#start $JustISOName$\r$\ntitle Start $JustISOName - Single Installer$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0  
   ${Else} 
    CopyFiles "$BootDir\bootmgr.efi" "$BootDir\multiboot\$JustISOName"
    CopyFiles "$BootDir\efi" "$BootDir\multiboot\$JustISOName"
-   ${WriteToFile} "#start $JustISOName$\r$\ntitle Start $JustISOName - Single Installer$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
+   ${WriteToFile} "#start $JustISOName$\r$\ntitle Install $JustISOName$\r$\ndd if=()/multiboot/$JustISOName/boot/bcd of=()/boot/bcd$\r$\ndd if=()/multiboot/$JustISOName/efi/microsoft/boot/bcd of=()/efi/microsoft/boot/bcd$\r$\nchainloader /multiboot/$JustISOName/bootmgr$\r$\n#end $JustISOName" $R0 
   ${Endif}
   
 ; Single Windows PE -files at root
@@ -473,6 +490,61 @@ FunctionEnd
  
 ; Unlisted ISOs
 
+ ${ElseIf} $DistroName == "Try Unlisted ISO (Virtual Hard Disk DD)"  
+ CopyFiles "$PLUGINSDIR\dd-diskpart.txt" "$BootDir\multiboot\$JustISOName\dd-diskpart.txt" 
+ CopyFiles "$PLUGINSDIR\diskpartdetach.txt" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt"   
+ Call SetISOSize
+ IntOp $VHDSize $SizeOfCasper + 100 ; add buffer space for vhd
+ !insertmacro ReplaceInFile "DSK" "$BootDir\multiboot\$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\dd-diskpart.txt" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\dd-diskpart.txt" 
+ !insertmacro ReplaceInFile "DSK" "$BootDir\multiboot\$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt"  
+ !insertmacro ReplaceInFile "VHDFMT" "fat32" "all" "all" "$BootDir\multiboot\$JustISOName\dd-diskpart.txt"  ; edit this to format type
+ !insertmacro ReplaceInFile "VHDSIZE" "$VHDSize" "all" "all" "$BootDir\multiboot\$JustISOName\dd-diskpart.txt"  ; edit this to beyond the calculated filesize in bytes (buffer)
+ nsExec::ExecToLog '"DiskPart" /S $BootDir\multiboot\$JustISOName\dd-diskpart.txt'
+ ExecWait '"$PLUGINSDIR\dd.exe" if=$ISOFile of=$BootDir\multiboot\$JustISOName\$JustISOName.vhd bs=2M --progress'
+; nsExec::ExecToLog '"DiskPart" /S $BootDir\multiboot\$JustISOName\diskpartdetach.txt' 
+ ${WriteToFile} "#start $JustISOName$\r$\ntitle Boot $JustISO$\r$\nmap --heads=0 --sectors-per-track=0 /multiboot/$JustISOName/$JustISOName.vhd (hd0)$\r$\nmap --hook$\r$\nchainloader (hd0)+1$\r$\nrootnoverify (hd0)$\r$\n#end $JustISOName" $R0    
+
+
+ ${ElseIf} $DistroName == "Try Unlisted ISO (Virtual Hard Disk)"
+ CopyFiles "$PLUGINSDIR\autounattend.xml" "$BootDir\multiboot\$JustISOName\autounattend.xml"   
+ CopyFiles "$PLUGINSDIR\vhdremount.cmd" "$BootDir\multiboot\$JustISOName\vhdremount.cmd" 
+ CopyFiles "$PLUGINSDIR\wimlib\stuff\au.txt" "$BootDir\multiboot\$JustISOName\au.txt"   
+ 
+ CopyFiles "$PLUGINSDIR\diskpart.txt" "$BootDir\multiboot\$JustISOName\diskpart.txt" 
+ CopyFiles "$PLUGINSDIR\diskpartdetach.txt" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt"   
+ 
+ !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\vhdremount.cmd"  
+ !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\autounattend.xml"  
+ !insertmacro ReplaceInFile "ISONAMESLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt"  
+ !insertmacro ReplaceInFile "BOOTDIRSLUG" "$BootDir" "all" "all" "$BootDir\multiboot\$JustISOName\au.txt" 
+ Call SetISOSize
+ IntOp $VHDSize $SizeOfCasper + 100 ; add buffer space for vhd
+ !insertmacro ReplaceInFile "DSK" "$BootDir\multiboot\$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\diskpart.txt" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\diskpart.txt" 
+ !insertmacro ReplaceInFile "DSK" "$BootDir\multiboot\$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt" 
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\diskpartdetach.txt"  
+ !insertmacro ReplaceInFile "VHDFMT" "fat32" "all" "all" "$BootDir\multiboot\$JustISOName\diskpart.txt"  ; edit this to format type
+ !insertmacro ReplaceInFile "VHDSIZE" "$VHDSize" "all" "all" "$BootDir\multiboot\$JustISOName\diskpart.txt"  ; edit this to beyond the calculated filesize in bytes
+ nsExec::ExecToLog '"DiskPart" /S $BootDir\multiboot\$JustISOName\diskpart.txt'
+ ;CopyFiles $ISOFile "v:\"
+ ;Call GetVolNameDSK
+ ExecWait '"$PLUGINSDIR\7zG.exe" x "$ISOFile" -x![BOOT] -o"V:\" -y'  
+
+  ${If} ${FileExists} "V:\sources\boot.wim"  
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update V:\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  ${Endif}
+  ${If} ${FileExists} "V:\x64\sources\boot.wim"  
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update V:\x64\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt' 
+  ${Endif}
+  ${If} ${FileExists} "V:\x86\sources\boot.wim"  
+  nsExec::ExecToLog '"cmd" /c $PLUGINSDIR\wimlib\wimlib-imagex update V:\x86\sources\boot.wim 2 < $BootDir\multiboot\$JustISOName\au.txt'     
+  ${Endif}
+  nsExec::ExecToLog '"DiskPart" /S $BootDir\multiboot\$JustISOName\diskpartdetach.txt' 
+ ${WriteToFile} "#start $JustISOName$\r$\ntitle Boot $JustISO$\r$\nmap (hd0) (hd1)$\r$\nmap (hd1) (hd0)$\r$\nmap --heads=0 --sectors-per-track=0 /multiboot/$JustISOName/$JustISOName.vhd (hd1)$\r$\nmap --hook$\r$\nchainloader (hd1)+1$\r$\nrootnoverify (hd1)$\r$\n#end $JustISOName" $R0    
+ 
+ 
 # The following Grub at Partition 4 entry adds a 4th partition table to the USB device and uses this as a placeholder for the ISO. 
 # Entry derived from information obtained from Steve of rmprepusb.com. Steve said the following were his original sources: http://reboot.pro/topic/9916-grub4dos-isohybrided/page-2#entry88531 and http://reboot.pro/topic/9916-grub4dos-isohybrided/page-2#entry164127
  ${ElseIf} $DistroName == "Try Unlisted ISO (GRUB Partition 4)" 
