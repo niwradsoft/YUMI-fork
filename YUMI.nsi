@@ -1,23 +1,40 @@
-; YUMI (Your Universal Multiboot Installer) Copyright ©2011-2016 Lance http://www.pendrivelinux.com (See YUMI-Copying.txt and YUMI-Readme.txt for more information, Credits, and Licensing)
-; 7-Zip Copyright © Igor Pavlovis http://7-zip.org (unmodified binaries were used)
-; Syslinux © H. Peter Anvin http://syslinux.zytor.com (unmodified binary used)
-; Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/ (unmodified binary used)
-; grub.exe Grub4DOS © the Gna! people + Chenall https://code.google.com/p/grub4dos-chenall/ (unmodified binary used) : Official Grub4DOS: http://gna.org/projects/grub4dos/
-; Fat32format.exe © Tom Thornhill Ridgecorp Consultants http://www.ridgecrop.demon.co.uk (unmodified binary used)
-; NSIS Installer © Contributors http://nsis.sourceforge.net - Install NSIS to compile this script. http://nsis.sourceforge.net/Download
-; YUMI may contain remnants of Cedric Tissieres's Tazusb.exe for Slitaz (slitaz@objectif-securite.ch), as his work was used as a base for singular distro installers that preceded YUMI.
-
+/*   
+  This file is part of YUMI
+ 
+  YUMI is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  any later version.
+ 
+  YUMI is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with YUMI.  If not, see <http://www.gnu.org/licenses/>.
+  
+  YUMI Copyright ©2011-2016 Lance http://www.pendrivelinux.com (See YUMI-Copying.txt and YUMI-Readme.txt for more information, and additional Credits)
+  7-Zip Copyright © Igor Pavlovis http://7-zip.org (unmodified binaries were used)
+  Syslinux © H. Peter Anvin http://syslinux.zytor.com (unmodified binary used)
+  Firadisk.img © Panot Joonkhiaw Karyonix http://reboot.pro/8804/ (unmodified binary used)
+  grub.exe Grub4DOS © the Gna! people + Chenall https://code.google.com/p/grub4dos-chenall/ (unmodified binary used) : Official Grub4DOS: http://gna.org/projects/grub4dos/
+  Fat32format.exe © Tom Thornhill Ridgecorp Consultants http://www.ridgecrop.demon.co.uk (unmodified binary used)
+  NSIS Installer © Contributors http://nsis.sourceforge.net - Install NSIS to compile this script. http://nsis.sourceforge.net/Download
+  YUMI may contain remnants of Cedric Tissieres's Tazusb.exe for Slitaz (slitaz@objectif-securite.ch), as his work was used as a base for singular distro installers that preceded YUMI. 
+ */
+ 
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.2.3"
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
+!define VERSION "2.0.2.4"
+!define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
 VIProductVersion "${VERSION}"
 VIAddVersionKey CompanyName "pendrivelinux.com"
 VIAddVersionKey LegalCopyright "Copyright ©2016 Lance Pendrivelinux.com"
 VIAddVersionKey FileVersion "${VERSION}"
-VIAddVersionKey FileDescription "Automated Universal MultiBoot UFD Creation Tool"
+VIAddVersionKey FileDescription "YUMI"
 VIAddVersionKey License "GPL Version 2"
 
 Name "${NAME} ${VERSION}"
@@ -113,7 +130,7 @@ Var Persistence
 ; Interface settings
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_BITMAP "usb-logo-nsis.bmp" 
+!define MUI_HEADERIMAGE_BITMAP "images\usb-logo-nsis.bmp" 
 !define MUI_HEADERIMAGE_BITMAP_NOSTRETCH
 !define MUI_HEADERIMAGE_RIGHT
 
@@ -141,7 +158,7 @@ Page custom SelectionsPage
 !define MUI_FINISHPAGE_TEXT $(Finish_Text)
 !define MUI_FINISHPAGE_LINK $(Finish_Link)
 !define MUI_FINISHPAGE_LINK_LOCATION "http://www.pendrivelinux.com/boot-multiple-iso-from-usb-multiboot-usb/"
-!define MUI_WELCOMEFINISHPAGE_BITMAP "finish.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "images\finish.bmp"
 !define MUI_PAGE_CUSTOMFUNCTION_PRE Finish_PreFunction
 !insertmacro MUI_PAGE_FINISH
 
@@ -170,7 +187,7 @@ LangString Install_Finish_Sucess ${LANG_ENGLISH} "${NAME} sucessfully $InUnStall
 LangString Finish_Install ${LANG_ENGLISH} "$InUnStallation is Complete."
 LangString Finish_Title ${LANG_ENGLISH} "${NAME} has completed the $InUnStallation."
 LangString Finish_Text ${LANG_ENGLISH} "Your Selections have been $InUnStalled on your USB drive.$\r$\n$\r$\nFeel Free to run this tool again to $InUnStall more Distros.$\r$\n$\r$\nYUMI will keep track of selections you have already $InUnStalled."
-LangString Finish_Link ${LANG_ENGLISH} "Visit the YUMI Tutorial Page"
+LangString Finish_Link ${LANG_ENGLISH} "Visit the YUMI Home Page"
 
 !include FileManipulation.nsh ; Text File Manipulation
 !include FileNames.nsh ; Macro for FileNames
@@ -285,7 +302,7 @@ Function SelectionsPage
   ${NSD_OnClick} $Format FormatIt     
  
 ; Add Help Link
-  ${NSD_CreateLink} 0 215 65% 15 "Click HERE to visit the YUMI page for additional Help!"
+  ${NSD_CreateLink} 0 215 65% 15 "Click HERE to visit the YUMI page for additional Info!"
   Pop $Link
   ${NSD_OnClick} $LINK onClickMyLink 
  
@@ -386,7 +403,7 @@ Function SelectionsPage
   ${NSD_OnNotify} $CasperSlider onNotify_CasperSlider    
   
 ; Add Help Link
-  ${NSD_CreateLink} 0 215 65% 15 "Click HERE to visit the YUMI page for additional Help!"
+  ${NSD_CreateLink} 0 215 65% 15 "Click HERE to visit the YUMI page for additional Info!"
   Pop $Link
   ${NSD_OnClick} $LINK onClickMyLink  
 
@@ -1220,7 +1237,6 @@ Function Config2Write
   ${WriteToSysFile} "label Unlisted ISO (via SYSLINUX)$\r$\nmenu label  Unlisted ISO (via SYSLINUX) ->$\r$\nMENU INDENT 1$\r$\nCONFIG /multiboot/menu/unlisted.cfg" $R0  
  ${ElseIf} $Config2Use == "menu.lst"
   ${WriteToSysFile} "label GRUB Bootable ISOs$\r$\nmenu label GRUB Bootable ISOs and Windows XP/7/8 ->$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/menu/menu.lst" $R0 
-  CopyFiles "$PLUGINSDIR\yumi.xpm.gz" "$BootDir\multiboot\menu\yumi.xpm.gz" 
  ${EndIf} 
 FunctionEnd
 
@@ -1278,8 +1294,7 @@ StrCpy $R9 0 ; we start on page 0
 ;  File /oname=$PLUGINSDIR\paypal.bmp "paypal.bmp"   
   File /oname=$PLUGINSDIR\syslinux.exe "syslinux.exe"  
   File /oname=$PLUGINSDIR\syslinux.cfg "syslinux.cfg"
-  File /oname=$PLUGINSDIR\menu.lst "menu.lst" 
-  File /oname=$PLUGINSDIR\yumi.xpm.gz "yumi.xpm.gz" 
+  File /oname=$PLUGINSDIR\menu.lst "menu.lst"  
   File /oname=$PLUGINSDIR\grub.exe "grub.exe"  
   File /oname=$PLUGINSDIR\info "menu\info"   
   File /oname=$PLUGINSDIR\antivirus.cfg "menu\antivirus.cfg" 
@@ -1291,7 +1306,7 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\liveusb "liveusb"   
   File /oname=$PLUGINSDIR\7zG.exe "7zG.exe"
   File /oname=$PLUGINSDIR\7z.dll "7z.dll"  
-  File /oname=$PLUGINSDIR\yumi.png "yumi.png"
+  File /oname=$PLUGINSDIR\yumi.png "images\yumi.png"
   File /oname=$PLUGINSDIR\YUMI-Copying.txt "YUMI-Copying.txt" 
   File /oname=$PLUGINSDIR\YUMI-Readme.txt "YUMI-Readme.txt" 
   File /oname=$PLUGINSDIR\license.txt "license.txt"   

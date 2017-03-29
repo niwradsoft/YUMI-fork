@@ -1,3 +1,23 @@
+/*
+ * This file is part of YUMI
+ *
+ * YUMI is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * any later version.
+ *
+ * YUMI is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with YUMI.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+; ------------ Distro List -------------- 
+
+
 Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO File name before extraction), Download2Get (Download Link), Path2Name (Final destination/Name of File), GimmeSize (Size of the File), Config2Use (Config File to Write To), File2Check (file to check for before adding Menu entry), Homepage, OfficialName
  
      !insertmacro SetISOFileNames "--- Ubuntu 32/64 Bit ---" "" "" "" "" "" ""
@@ -23,8 +43,8 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
      !insertmacro SetISOFileNames "--- Debian Live 32/64 Bit ---" "" "" "" "" "" ""
 	 !insertmacro SetISOFileNames "" "" "" "" "" "" ""
 	 
- !insertmacro SetISOFileNames "Debian Live 32bit" "debian-live*desktop.iso" "http://cdimage.debian.org/debian-cd/current-live/i386/iso-hybrid/" "NULL" "linux.cfg" "http://live.debian.net" "Debian Live"
- !insertmacro SetISOFileNames "Debian Live 64bit" "debian-live*desktop.iso" "http://cdimage.debian.org/cdimage/release/current-live/amd64/iso-hybrid/" "NULL" "linux.cfg" "http://live.debian.net" "Debian Live"
+; !insertmacro  SetISOFileNames "Debian Live 32bit" "debian-live*desktop.iso" "http://cdimage.debian.org/debian-cd/current-live/i386/iso-hybrid/" "NULL" "linux.cfg" "http://live.debian.net" "Debian Live"
+ !insertmacro SetISOFileNames "Debian Live" "debian-live*desktop.iso" "http://cdimage.debian.org/cdimage/release/current-live/amd64/iso-hybrid/" "NULL" "linux.cfg" "http://live.debian.net" "Debian Live"
 
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
      !insertmacro SetISOFileNames "--- Fedora 32/64 Bit ---" "" "" "" "" "" ""
@@ -73,6 +93,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Calculate Linux Desktop" "cld*.iso" "ftp://ftp.gtlib.gatech.edu/pub/calculate/release/15.12/cld-15.12-i686.iso" "NULL" "linux.cfg" "http://www.calculate-linux.org/" "Calculate Linux"
  !insertmacro SetISOFileNames "CentOS" "CentOS*.iso" "http://mirror.cisp.com/CentOS/7/isos/x86_64/CentOS-7-x86_64-LiveCD-1503.iso" "NULL" "linux.cfg" "http://www.centos.org" "CentOS"
  !insertmacro SetISOFileNames "Crunchbang" "crunchbang*.iso" "https://www.bunsenlabs.org/installation.html" "NULL" "linux.cfg" "http://crunchbang.org" "Crunchbang"
+ !insertmacro SetISOFileNames "Cub Linux" "CubLinux*.iso" "https://cublinux.com/download" "casper" "linux.cfg" "https://cublinux.com/" "CubLinux" 
  !insertmacro SetISOFileNames "Damn Small Linux (DSL)" "dsl*initrd.iso" "ftp://distro.ibiblio.org/pub/linux/distributions/damnsmall/current/dsl-4.4.10-initrd.iso" "NULL" "linux.cfg" "http://www.damnsmalllinux.org" "DSL"
  !insertmacro SetISOFileNames "Elementary OS" "elementaryos-stable*.iso" "http://sourceforge.net/projects/elementaryos/files/stable/elementaryos-stable-amd64.20130810.iso/download" "NULL" "linux.cfg" "http://elementaryos.org/" "Elementary OS"
 ;Discontinued !insertmacro SetISOFileNames "Dreamlinux" "dreamlinux*.iso" "http://download.linux-live-cd.org/iso/Dreamlinux/Dreamlinux-5.iso" "NULL" "linux.cfg" "http://www.dreamlinux.info/" "Dreamlinux" 
@@ -183,7 +204,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "System Rescue CD" "systemrescuecd*.iso" "http://sourceforge.net/projects/systemrescuecd/files/latest/download" "NULL" "system.cfg" "http://www.sysresccd.org" "System Rescue"
  !insertmacro SetISOFileNames "Trinity Rescue Kit" "trinity-rescue-kit*.iso" "ftp://ftp.osuosl.org/pub/trk/trinity-rescue-kit.3.4-build-372.iso" "NULL" "system.cfg" "http://trinityhome.org" "TRK"
  !insertmacro SetISOFileNames "Ultimate Boot CD (Diagnostics Tools)" "ubcd5*.iso" "http://ftp.cc.uoc.gr/mirrors/linux/ubcd/ubcd535.iso" "NULL" "system.cfg" "http://www.ultimatebootcd.com" "Ultimate Boot CD"
- !insertmacro SetISOFileNames "Wifislax (Wireless Penetration Testing)" "wifislax-4*.iso" "http://www.wifislax.com/" "NULL" "system.cfg" "http://www.wifislax.com/" "Wifislax"
+ !insertmacro SetISOFileNames "Wifislax (Wireless Penetration Testing)" "wifislax-4*.iso" "http://www.wifislax.com/category/download/nuevas-versiones/" "NULL" "system.cfg" "http://www.wifislax.com/" "Wifislax"
 ;REVISIT filename contains spaces !insertmacro SetISOFileNames "XIAOPAN (Wireless Penetration Testing)" "XIAOPAN*.iso" "http://sourceforge.net/projects/xiaopanos/files/latest/download" "NULL" "system.cfg" "http://xiaopan.co/forums/" "XIAOPAN"
 
      !insertmacro SetISOFileNames "" "" "" "" "" "" ""
