@@ -25,6 +25,7 @@ Credits, Resources, and Third Party Tools used:
 Additional information for YUMI can be found HERE: http://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 Changelog:
+12/10/16 Version 2.0.3.1: Update Get Drives function to ignore system and network drives. Add filesystem and drive type to drive list. Add lock, dismount, and unlock features.
 12/02/16 Version 2.0.3.0: Update to support ChaletOS and Bunsenlabs. Support newer Fedora Workstation Live and Zorin Core ISOs. Fix CentOS Link. Create a trk3 directory at the root of USB before copying files (necessary for Windows XP copyfiles).
 10/03/16 Version 2.0.2.9: Switch back to 7-Zip 9.20.
 09/14/16 Version 2.0.2.8: Fix menu entries for boot repair, and elementary OS. Upgrade to 7-Zip 16.02.
