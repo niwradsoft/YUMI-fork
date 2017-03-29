@@ -22,6 +22,7 @@ Credits, Resources, and Third Party Tools used:
 Additional instructions for YUMI can be found HERE: http://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 Changelog:
+07/01/16 Version 2.0.2.5: Fix Eset, avira, and Dr.Web menu entries which became broken in build 2.0.2.4. 
 06/28/16 Version 2.0.2.4: Update to support Cub Linux. Fix broken WifiSlax entry. Switch to use alternate method for old Ubuntu derivitives with conflicting syslinux gfxboot.
 06/01/16 Version 2.0.2.3: Fixed bug: calculating remaining space on USB drive. Switch back to using vesamenu for sub-menu config files. Remove unused Prompt 0 from config. Re-enable Ubuntu gfxboot.
 04/14/16 Version 2.0.2.2: Update to support Linux Kid X, Linux Lite, Subgraph OS, and Calculate Linux Desktop. Re-enable entry for Offline NT Password and Registry Editor.
