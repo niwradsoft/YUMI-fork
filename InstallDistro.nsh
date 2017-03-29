@@ -365,18 +365,27 @@ FunctionEnd
   ${EndIf}
   
 ; Disable Ubuntu modified gfxboot as the Ubuntu bootlogo archive does not currently contain all necessary files for newer syslinux 6+.
-   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg" ; Rename the following for isolinux.cfg  
-   !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   
-   ${EndIf} 
-   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\syslinux\syslinux.cfg"
-   !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\syslinux\syslinux.cfg"      
-   ${EndIf}
-   
+   ; ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg" ; Rename the following for isolinux.cfg  
+   ; !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\isolinux\isolinux.cfg"   
+   ; ${EndIf} 
+   ; ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\syslinux\syslinux.cfg"
+   ; !insertmacro ReplaceInFile "ui gfxboot bootlogo" "# ui gfxboot bootlogo" "all" "all" "$BootDir\multiboot\$JustISOName\syslinux\syslinux.cfg"      
+   ; ${EndIf}
+  
   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg" ; Rename the following for grub loopback.cfg
   !insertmacro ReplaceInFile "file=/cdrom/preseed/" "file=/cdrom/multiboot/$JustISOName/preseed/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg"  
-  !insertmacro ReplaceInFile "linux	/casper/" "linux /multiboot/$JustISOName/casper/ cdrom-detect/try-usb=true noprompt floppy.allowed_drive_mask=0 ignore_uuid live-media-path=/multiboot/$JustISOName/casper/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg"  
-  !insertmacro ReplaceInFile "initrd /casper/" "initrd /multiboot/$JustISOName/casper/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg" 
+  !insertmacro ReplaceInFile "/casper/vmlinuz" "/multiboot/$JustISOName/casper/vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg"  
+  !insertmacro ReplaceInFile "/casper/initrd" "/multiboot/$JustISOName/casper/initrd" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg" 
+  !insertmacro ReplaceInFile "boot=casper" "cdrom-detect/try-usb=true noprompt floppy.allowed_drive_mask=0 ignore_uuid boot=NULL live-media-path=/multiboot/$JustISOName/casper/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg"  
+  !insertmacro ReplaceInFile "boot=NULL" "boot=casper" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\loopback.cfg"  
   ${EndIf}
+  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\boot\grub\grub.cfg" ; Rename the following for grub.cfg
+  !insertmacro ReplaceInFile "file=/cdrom/preseed/" "file=/cdrom/multiboot/$JustISOName/preseed/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\grub.cfg"  
+  !insertmacro ReplaceInFile "/casper/vmlinuz" "/multiboot/$JustISOName/casper/vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\grub.cfg"  
+  !insertmacro ReplaceInFile "/casper/initrd" "/multiboot/$JustISOName/casper/initrd" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\grub.cfg"   
+  !insertmacro ReplaceInFile "boot=casper" "cdrom-detect/try-usb=true noprompt floppy.allowed_drive_mask=0 ignore_uuid boot=NULL live-media-path=/multiboot/$JustISOName/casper/" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\grub.cfg"  
+  !insertmacro ReplaceInFile "boot=NULL" "boot=casper" "all" "all" "$BootDir\multiboot\$JustISOName\boot\grub\grub.cfg"  
+  ${EndIf}  
 
 ; For Ubuntu Server  
   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\install\netboot\ubuntu-installer\i386\*.*"  

@@ -9,7 +9,7 @@
 
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.2.2"
+!define VERSION "2.0.2.3"
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -711,7 +711,10 @@ Function ISOBrowse
  ${GetBaseName} "$JustISO" $JustISOName
  ${GetParent} "$TheISO" $JustISOPath
  StrCpy $LocalSelection "Yes"
- Call SetISOSize
+  Call SetISOSize
+  Call SetSpace
+  Call CheckSpace
+  Call HaveSpacePre
  ${If} $JustISOName == "" 
  StrCpy $JustISOName "NULL" ; Set to NULL until something is selected
  ${EndIf}
@@ -950,13 +953,23 @@ Function SetSpace ; Set space available for persistence
   SendMessage $CasperSlider ${TBM_SETRANGEMAX} 1 $RemainingSpace ; Re-Setting Max Value
 FunctionEnd
 
-Function HaveSpace ; Check space required
+Function HaveSpacePre ; Check space required
   Call CasperSize
   Call FreeDiskSpace
   System::Int64Op $1 > $SizeOfCasper ; Compare the space available > space required
   Pop $3 ; Get the result ...
   IntCmp $3 1 okay ; ... and compare it
   MessageBox MB_ICONSTOP|MB_OK "Oops: There is not enough disk space! $1 MB Free, $SizeOfCasper MB Needed on $JustDrive Drive."
+  okay: ; Proceed to execute...
+FunctionEnd
+
+Function HaveSpace ; Check space required
+  Call CasperSize
+  Call FreeDiskSpace
+  System::Int64Op $1 > $SizeOfCasper ; Compare the space available > space required
+  Pop $3 ; Get the result ...
+  IntCmp $3 1 okay ; ... and compare it
+  MessageBox MB_ICONSTOP|MB_OK "Not enough free space remains. Closing YUMI!"
   quit ; Close the program if the disk space was too small...
   okay: ; Proceed to execute...
   ;MessageBox MB_OK "ISO + Persistence will use $SizeOfCasper MB of the $1 MB Free disk space on $JustDrive Drive."  
@@ -1115,10 +1128,10 @@ FunctionEnd
 Function AddDir ; changes to check if user had a version prior to 0.0.0.3 which now includes grub.exe 
  ${IfNotThen} ${FileExists} "$BootDir\multiboot\grub.exe" 'CopyFiles "$PLUGINSDIR\grub.exe" "$BootDir\multiboot\grub.exe"' 
 ; Windows/Ubuntu SOURCES conflict fix
- ${IfNot} ${FileExists} $BootDir\.disk\info 
-  CreateDirectory $BootDir\.disk 
-  CopyFiles "$PLUGINSDIR\info" "$BootDir\.disk\info"
- ${EndIf} 
+ ;${IfNot} ${FileExists} $BootDir\.disk\info 
+  ; CreateDirectory $BootDir\.disk 
+  ; CopyFiles "$PLUGINSDIR\info" "$BootDir\.disk\info"
+ ;${EndIf} 
 FunctionEnd
 
 ; ---- Let's Do This Stuff ----

@@ -23,6 +23,7 @@ Credits, Resources, and Third Party Tools used:
 Additional instructions for YUMI can be found HERE: http://www.pendrivelinux.com/yumi-multiboot-usb-creator/
 
 Changelog:
+06/01/16 Version 2.0.2.3: Fixed bug: calculating remaining space on USB drive. Switch back to using vesamenu for sub-menu config files. Remove unused Prompt 0 from config. Re-enable Ubuntu gfxoot.
 04/14/16 Version 2.0.2.2: Update to support Linux Kid X, Linux Lite, Subgraph OS, and Calculate Linux Desktop. Re-enable entry for Offline NT Password and Registry Editor.
 04/06/16 Version 2.0.2.1: Added support for WattOS, update SLAX option, update links, disable feature to close all open explorer windows when format option is selected. Update Fat32Format.
 12/28/15 Version 2.0.2.0: Add GRUB (partition 4) option. Update to support Xioapan, Windows 10, Bitdefender Rescue CD options. Update DBan option.
