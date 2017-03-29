@@ -26,6 +26,7 @@ Additional information for YUMI can be found HERE: http://www.pendrivelinux.com/
 
 Changelog:
 
+12/22/16 Version 2.0.3.4: Quick fix to correct the double Distro list during step 2.
 12/19/16 Version 2.0.3.3: Update Get Drives function to ignore system and network drives on subsequent YUMI installs. Corrected UI vesamenu paths.
 12/12/16 Version 2.0.3.2: Update to support Solus. Reinclude show all drives option and disable FSCTL lock, dismount, and unlock volume features until a better solution is found.
 12/10/16 Version 2.0.3.1: Update Get Drives function to ignore system and network drives. Add filesystem and drive type to drive list. Add lock, dismount, and unlock features.
