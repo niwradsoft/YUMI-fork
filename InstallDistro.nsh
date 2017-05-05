@@ -219,6 +219,7 @@ FunctionEnd
  ;${WriteToFile} "#start $JustISOName$\r$\nLABEL $JustISOName$\r$\nMENU LABEL $JustISOName$\r$\nCONFIG /boot/isolinux/isolinux.cfg$\r$\nAPPEND /boot/isolinux$\r$\n#end $JustISOName" $R0
  
   ${ElseIf} $DistroName == "Ubuntu" 
+  ${OrIf} $DistroName == "Ubuntu Budgie" 
   ${OrIf} $DistroName == "Edubuntu" 
   ${OrIf} $DistroName == "Xubuntu" 
    ${OrIf} $DistroName == "Kubuntu" 
@@ -704,6 +705,42 @@ ${EndIf}
  !insertmacro ReplaceInFile "JUSTISO" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
  ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/generic.lst$\r$\n#end $JustISOName" $R0  
   
+ ${ElseIf} $DistroName == "Devuan" 
+ CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!vmlinu* -ir!init* -o"$BootDir\multiboot\$JustISOName\" -y'
+ File /oname=$PLUGINSDIR\generic.lst "Menu\generic.lst"  
+ CopyFiles "$PLUGINSDIR\generic.lst" "$BootDir\multiboot\$JustISOName\generic.lst"   
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ !insertmacro ReplaceInFile "JUSTISO" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/generic.lst$\r$\n#end $JustISOName" $R0  
+  
+ ${ElseIf} $DistroName == "Vinari OS" 
+ CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!vmlinu* -ir!init* -o"$BootDir\multiboot\$JustISOName\" -y'
+ File /oname=$PLUGINSDIR\generic.lst "Menu\generic.lst"  
+ CopyFiles "$PLUGINSDIR\generic.lst" "$BootDir\multiboot\$JustISOName\generic.lst"   
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ !insertmacro ReplaceInFile "JUSTISO" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/generic.lst$\r$\n#end $JustISOName" $R0  
+
+ ${ElseIf} $DistroName == "Finnix" 
+ CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!vmlinu* -ir!init* -o"$BootDir\multiboot\$JustISOName\" -y'
+ File /oname=$PLUGINSDIR\generic.lst "Menu\generic.lst"  
+ CopyFiles "$PLUGINSDIR\generic.lst" "$BootDir\multiboot\$JustISOName\generic.lst"   
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ !insertmacro ReplaceInFile "JUSTISO" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/generic.lst$\r$\n#end $JustISOName" $R0  
+ 
+ ${ElseIf} $DistroName == "KDE Neon" 
+ CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!vmlinu* -ir!init* -o"$BootDir\multiboot\$JustISOName\" -y'
+ File /oname=$PLUGINSDIR\generic.lst "Menu\generic.lst"  
+ CopyFiles "$PLUGINSDIR\generic.lst" "$BootDir\multiboot\$JustISOName\generic.lst"   
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ !insertmacro ReplaceInFile "JUSTISO" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/generic.lst$\r$\n#end $JustISOName" $R0   
+    
  ${ElseIf} $DistroName == "Try Unlisted ISO (Virtual Hard Disk)"
  CopyFiles "$PLUGINSDIR\autounattend.xml" "$BootDir\multiboot\$JustISOName\autounattend.xml"   
  CopyFiles "$PLUGINSDIR\vhdremount.cmd" "$BootDir\multiboot\$JustISOName\vhdremount.cmd" 

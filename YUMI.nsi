@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.7"
+!define VERSION "2.0.4.8"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -940,6 +940,13 @@ Function OnSelectDrive
   ${If} $FSType == "exFAT"
   MessageBox MB_ICONSTOP|MB_OK "WARNING! Syslinux won't work on exFAT formatted devices. Please format $DestDisk Fat32 or NTFS."
   ${EndIf} 
+  
+  ${If} ${FileExists} "$BootDir\boot\grub\yumi.png"  
+   ${AndIf} ${FileExists} "$BootDir\boot\grub\lnxboot.img"
+    ${AndIf} ${FileExists} "$BootDir\boot\grub\core.img" 
+     ${AndIf} ${FileExists} "$BootDir\boot\grub\grub.cfg"  
+     MessageBox MB_ICONSTOP|MB_OK "WARNING! ($DestDisk) contains a UEFI YUMI or GRUB2 based Installation which is not compatible with this version.$\r$\n$\r$\nYou'll need to format this drive if you plan to use this version of YUMI."
+  ${EndIf} 
 FunctionEnd
 
 Function GetDiskVolumeName
@@ -1249,7 +1256,12 @@ Function DoSyslinux ; Install Syslinux on USB
     DetailPrint "Adding wimboot and linux.c32."   
     CopyFiles "$PLUGINSDIR\wimboot" "$BootDir\multiboot\wimboot"
     CopyFiles "$PLUGINSDIR\linux.c32" "$BootDir\multiboot\linux.c32"  
-   ${EndIf}      
+   ${EndIf}     
+
+   ${IfNot} ${FileExists} $BootDir\multiboot\legacy-yumi ; legacy-yumi test file.  
+    DetailPrint "Adding legacy-yumi test file."   
+    CopyFiles "$PLUGINSDIR\legacy-yumi" "$BootDir\multiboot\legacy-yumi"  
+   ${EndIf}
   
   ${If} ${FileExists} $BootDir\multiboot\syslinux.cfg    
    DetailPrint "A Previous MultiBoot Installation was detected... proceeding to add your new selections."
@@ -1336,7 +1348,7 @@ Push 1
 Call GrabNameOnly
 Pop $NameThatISO
 
- ${If} ${FileExists} "$BootDir\windows\system32" ; additional safeguard to protect from potential user error. 
+ ${If} ${FileExists} "$BootDir\windows\system32" ; Additional safeguard to prevent installation to a Windows partition.
  MessageBox MB_ICONSTOP|MB_OK "ABORTING! ($DestDisk) contains a WINDOWS/SYSTEM32 Directory."
  Quit
  ${EndIf}
@@ -1513,6 +1525,7 @@ StrCpy $R9 0 ; we start on page 0
   File /oname=$PLUGINSDIR\autounattend.xml "autounattend.xml"   
   File /oname=$PLUGINSDIR\syslinux.exe "syslinux.exe"  
   File /oname=$PLUGINSDIR\syslinux.cfg "syslinux.cfg"
+  File /oname=$PLUGINSDIR\legacy-yumi "menu\legacy-yumi"  
   File /oname=$PLUGINSDIR\menu.lst "menu\menu.lst"  
   File /oname=$PLUGINSDIR\vhd.lst "menu\vhd.lst" 
   File /oname=$PLUGINSDIR\grubpart4.lst "menu\grubpart4.lst"  
