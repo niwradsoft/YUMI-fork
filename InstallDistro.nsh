@@ -226,6 +226,13 @@ FunctionEnd
 	 ${OrIf} $DistroName == "Ubuntu Mate" 
       ${OrIf} $DistroName == "Ubuntu Gnome" 	   
 	   ${OrIf} $DistroName == "Linux Mint" 
+	   
+	   	${OrIf} $DistroName == "ChaletOS" 
+	   	${OrIf} $DistroName == "Cub Linux" 
+	    ${OrIf} $DistroName == "LXLE Desktop" 
+		${OrIf} $DistroName == "mintyMac" 
+		${OrIf} $DistroName == "Peach OSI" 
+		${OrIf} $DistroName == "Skywave" 
 	   	;${OrIf} $DistroName == "Debian Live"
 		 
   ${If} $FSType == "NTFS" 
@@ -246,6 +253,7 @@ FunctionEnd
   ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/ubuntu.lst$\r$\n#end $JustISOName" $R0   
  
    ${If} $DistroName == "Ubuntu"
+      ${OrIf} $DistroName == "Cub Linux"
     !insertmacro ReplaceInFile "SLEED" "ubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
     ${ElseIf} $DistroName == "Edubuntu"
     !insertmacro ReplaceInFile "SLEED" "edubuntu.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"  
@@ -260,23 +268,46 @@ FunctionEnd
     ${ElseIf} $DistroName == "Ubuntu Mate"
     !insertmacro ReplaceInFile "SLEED" "ubuntu-mate.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"		
     ${ElseIf} $DistroName == "Linux Mint"
-    !insertmacro ReplaceInFile "SLEED" "linuxmint.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 		
+    !insertmacro ReplaceInFile "SLEED" "linuxmint.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+    ${ElseIf} $DistroName == "ChaletOS" 
+	${OrIf} $DistroName == "Peach OSI"
+	!insertmacro ReplaceInFile "SLEED" "custom.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+	${Else}
+	!insertmacro ReplaceInFile "SLEED" "custom.seed" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
     ${EndIf}
 	
   !insertmacro ReplaceInFile "SLUG" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
   !insertmacro ReplaceInFile "DLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
   
-  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz.efi"
-  !insertmacro ReplaceInFile "VLUG" "vmlinuz.efi" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
-  ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz"
-  !insertmacro ReplaceInFile "VLUG" "vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"   
-  ${EndIf}  
+  ${If} $DistroName == "ChaletOS"   
   
-  ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.lz"  
-  !insertmacro ReplaceInFile "ILUG" "initrd.lz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
-  ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.gz"  
-  !insertmacro ReplaceInFile "ILUG" "initrd.gz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
-  ${EndIf}  
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz.efi"
+   !insertmacro ReplaceInFile "/casper/VLUG" "/chaletos64bit/casper/vmlinuz.efi" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+   ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz"
+   !insertmacro ReplaceInFile "/casper/VLUG" "/chaletos64bit/casper/vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"   
+   ${EndIf}  
+  
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.lz"  
+   !insertmacro ReplaceInFile "/casper/ILUG" "/chaletos64bit/casper/initrd.lz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
+   ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.gz"  
+   !insertmacro ReplaceInFile "/casper/ILUG" "/chaletos64bit/casper/initrd.gz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+   ${EndIf} 
+
+  ${Else}
+  
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz.efi"
+   !insertmacro ReplaceInFile "VLUG" "vmlinuz.efi" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+   ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\vmlinuz"
+   !insertmacro ReplaceInFile "VLUG" "vmlinuz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"   
+   ${EndIf}  
+  
+   ${If} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.lz"  
+   !insertmacro ReplaceInFile "ILUG" "initrd.lz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst"
+   ${ElseIf} ${FileExists} "$BootDir\multiboot\$JustISOName\initrd.gz"  
+   !insertmacro ReplaceInFile "ILUG" "initrd.gz" "all" "all" "$BootDir\multiboot\$JustISOName\ubuntu.lst" 
+   ${EndIf}  
+  
+  ${EndIf}
    
   ; Enable Persistence
     ${If} $Persistence == "casper"
@@ -299,6 +330,7 @@ FunctionEnd
  ${ElseIf} $DistroName == "Linux Mint"
   ${OrIf} $DistroName == "AVIRA AntiVir Rescue CD (Virus Scanner)"
   ${OrIf} $DistroName == "Cub Linux"
+    ${OrIf} $DistroName == "Debian Live"
  ${AndIfNot} $JustISO == "linuxmint-201403-cinnamon-dvd-32bit.iso"
  ${AndIfNot} $JustISO == "linuxmint-201403-mate-dvd-32bit.iso" 
  ${AndIfNot} $JustISO == "linuxmint-201403-cinnamon-dvd-64bit.iso"
@@ -663,7 +695,15 @@ ${EndIf}
 ; nsExec::ExecToLog '"DiskPart" /S $BootDir\multiboot\$JustISOName\diskpartdetach.txt' 
  ${WriteToFile} "#start $JustISOName$\r$\ntitle Boot $JustISO$\r$\nmap --heads=0 --sectors-per-track=0 /multiboot/$JustISOName/$JustISOName.vhd (hd0)$\r$\nmap --hook$\r$\nchainloader (hd0)+1$\r$\nrootnoverify (hd0)$\r$\n#end $JustISOName" $R0    
 
-
+ ${ElseIf} $DistroName == "Manjaro" 
+ CopyFiles $ISOFile "$BootDir\multiboot\$JustISOName\$JustISO" ; Copy the ISO to Directory
+ ExecWait '"$PLUGINSDIR\7zG.exe" e "$ISOFile" -ir!vmlinu* -ir!init* -o"$BootDir\multiboot\$JustISOName\" -y'
+ File /oname=$PLUGINSDIR\generic.lst "Menu\generic.lst"  
+ CopyFiles "$PLUGINSDIR\generic.lst" "$BootDir\multiboot\$JustISOName\generic.lst"   
+ !insertmacro ReplaceInFile "SLUG" "$JustISOName" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ !insertmacro ReplaceInFile "JUSTISO" "$JustISO" "all" "all" "$BootDir\multiboot\$JustISOName\generic.lst"  
+ ${WriteToFile} "#start $JustISOName$\r$\nlabel $JustISOName$\r$\nmenu label $JustISOName$\r$\nMENU INDENT 1$\r$\nKERNEL /multiboot/grub.exe$\r$\nAPPEND --config-file=/multiboot/$JustISOName/generic.lst$\r$\n#end $JustISOName" $R0  
+  
  ${ElseIf} $DistroName == "Try Unlisted ISO (Virtual Hard Disk)"
  CopyFiles "$PLUGINSDIR\autounattend.xml" "$BootDir\multiboot\$JustISOName\autounattend.xml"   
  CopyFiles "$PLUGINSDIR\vhdremount.cmd" "$BootDir\multiboot\$JustISOName\vhdremount.cmd" 
@@ -1128,6 +1168,9 @@ ${EndIf}
    !insertmacro ReplaceInFile "archisobasedir=arch" "archisobasedir=/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_pxe32.cfg"     
    !insertmacro ReplaceInFile "archisolabel=ARCH" "archisolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_pxe32.cfg"  
 
+   !insertmacro ReplaceInFile "archisobasedir=arch" "archisobasedir=/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys.cfg"     
+   !insertmacro ReplaceInFile "archisolabel=ARCH" "archisolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys.cfg"    
+   
    !insertmacro ReplaceInFile "archisobasedir=arch" "archisobasedir=/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys64.cfg"     
    !insertmacro ReplaceInFile "archisolabel=ARCH" "archisolabel=MULTIBOOT NULL=" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys64.cfg"     
    !insertmacro ReplaceInFile "archisobasedir=arch" "archisobasedir=/multiboot/$JustISOName/arch" "all" "all" "$BootDir\multiboot\$JustISOName\arch\boot\syslinux\archiso_sys32.cfg"     

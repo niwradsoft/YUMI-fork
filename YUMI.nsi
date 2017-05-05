@@ -19,7 +19,7 @@
  
 !define NAME "YUMI"
 !define FILENAME "YUMI"
-!define VERSION "2.0.4.6"
+!define VERSION "2.0.4.7"
 !define MUI_ICON "images\usbicon.ico" ; "${NSISDIR}\Contrib\Graphics\Icons\nsis1-install.ico"
 
 ; MoreInfo Plugin - Adds Version Tab fields to Properties. Plugin created by onad http://nsis.sourceforge.net/MoreInfo_plug-in
@@ -1465,6 +1465,7 @@ StrCpy $ISOFile "" ; Reset
 StrCpy $Removal "" ; Reset
 StrCpy $Persistence "NULL" ; Reset
 StrCpy $NameThatISO "" ; Reset NameThatISO ISO Name
+StrCpy $ConfigFile "" ; Clear ConfigFile 
 StrCpy $Config2Use "" ; Clear Config File to create and write to
 StrCpy $DistroName "" ; Clear Distro Name
 StrCpy $ISOFileName "" ; Clear ISO Selection

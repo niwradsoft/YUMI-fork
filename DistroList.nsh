@@ -17,9 +17,8 @@
 
 ; ------------ Distro List -------------- 
 
-
 Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO File name before extraction), Download2Get (Download Link), Path2Name (Final destination/Name of File), GimmeSize (Size of the File), Config2Use (Config File to Write To), File2Check (file to check for before adding Menu entry), Homepage, OfficialName
- 
+
      !insertmacro SetISOFileNames "--- Ubuntu 32/64 Bit ---" "" "" "" "" "" ""
 	 !insertmacro SetISOFileNames "" "" "" "" "" "" ""
 	 
@@ -91,7 +90,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "Android x86" "android-x86*.iso" "https://www.fosshub.com/Android-x86.html" "NULL" "linux.cfg" "http://www.android-x86.org/" "Android-x86"   	 
  !insertmacro SetISOFileNames "AntiX" "antiX*.iso" "https://sourceforge.net/projects/antix-linux/files/Final/antiX-16/antiX-16.1_386-full.iso/download" "NULL" "linux.cfg" "http://sourceforge.net/projects/antix-linux/" "AntiX"   
  !insertmacro SetISOFileNames "Archbang" "archbang*.iso" "https://sourceforge.net/projects/archbang/files/ArchBang-OpenRC/archbang-openrc-rc-100816-x86_64.iso/download" "NULL" "linux.cfg" "https://sourceforge.net/projects/archbang/" "Archbang"   
- !insertmacro SetISOFileNames "Archlinux" "archlinux*dual.iso" "http://mirrors.us.kernel.org/archlinux/iso/latest/" "NULL" "linux.cfg" "http://www.archlinux.org" "Archlinux"  
+ !insertmacro SetISOFileNames "Archlinux" "archlinux*.iso" "http://mirrors.us.kernel.org/archlinux/iso/latest/" "NULL" "linux.cfg" "http://www.archlinux.org" "Archlinux"  
  !insertmacro SetISOFileNames "Bodhi" "bodhi*.iso" "https://sourceforge.net/projects/bodhilinux/files/latest/download" "NULL" "linux.cfg" "http://www.bodhilinux.com" "Bodhi"  
  !insertmacro SetISOFileNames "Bunsenlabs" "bl-*.iso" "https://www.bunsenlabs.org/installation.html#downloads" "NULL" "linux.cfg" "https://www.bunsenlabs.org/" "Bunsenlabs"
  !insertmacro SetISOFileNames "CAELinux (Computer Aided Engineering)" "caelinux*.iso" "http://caelinux.com/CMS/index.php?option=com_content&view=section&id=3&Itemid=40" "NULL" "linux.cfg" "http://caelinux.com/CMS/" "CAELinux"  
@@ -117,7 +116,7 @@ Function SetISOFileName ; Distro2Check (Name of the Distro), ISO2Check2 (The ISO
  !insertmacro SetISOFileNames "LXLE Desktop" "lxle*.iso" "http://sourceforge.net/projects/lxle/files/latest/download?source=files" "casper" "linux.cfg" "http://lxle.net/" "LXLE Desktop"  
  !insertmacro SetISOFileNames "Mageia Live CD" "Mageia*LiveCD*.iso" "http://mirrors.kernel.org/mageia/iso/2/Mageia-2-dual-CD/Mageia-2-dual-CD.iso" "NULL" "linux.cfg" "http://www.mageia.org" "Mageia"
 ;Discontinued !insertmacro SetISOFileNames "Mandriva 2011" "Mandriva.2011*.iso" "ftp://ftp.uwsg.indiana.edu/linux/mandrake/official/iso/2011/Mandriva.2011.x86_64.1.iso" "NULL" "linux.cfg" "http://www.mandriva.com" "Mandriva"
- !insertmacro SetISOFileNames "Manjaro" "Manjaro*.iso" "http://manjaro.github.io/download/" "NULL" "linux.cfg" "http://manjaro.org" "Manjaro"
+ !insertmacro SetISOFileNames "Manjaro" "Manjaro*.iso" "https://manjaro.org/get-manjaro/" "NULL" "linux.cfg" "http://manjaro.org" "Manjaro"
  !insertmacro SetISOFileNames "mintyMac" "minty*.iso" "http://sourceforge.net/projects/mintymacpremium/files/latest/download" "casper" "linux.cfg" "http://sourceforge.net/projects/mintymacpremium/" "MintyMac"
  !insertmacro SetISOFileNames "Mythbuntu" "mythbuntu*.iso" "http://www.mythbuntu.org/downloads" "NULL" "linux.cfg" "http://mythbuntu.org/" "Mythbuntu"
 ;Revisit !insertmacro SetISOFileNames "MultiCore" "multicore-current.iso" "http://distro.ibiblio.org/pub/linux/distributions/tinycorelinux/3.x/release/multicore-current.iso" "NULL" "linux.cfg" "http://www.tinycorelinux.com" "MultiCore"
